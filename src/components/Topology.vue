@@ -1,40 +1,33 @@
 <template>
-    <div>
-        <div id="topology"></div>
-    </div>
+    <div id="topology"></div>
 </template>
 
 <script>
-import {_init} from '@/topology.js';
+import {defind_html} from '@/joint/joint.shapes.html.js';
+import {_init} from '@/joint/html.js'
+// import {_init} from '@/joint/topology.js';
 export default {
     name: "Topology",
     mounted() {
-        _init();
+        defind_html();
+        this.graph = new joint.dia.Graph;
+        this.paper = new joint.dia.Paper({
+            el: $('#topology'),
+            model: this.graph
+        });
+        _init(this.graph, this.paper);
+
+    },
+    data() {
+        return {
+            graph: null,
+            paper: null
+        }
     }
 }
 </script>
 
 <style lang="scss">
-#topology {
-    position: relative;
-    border: 1px solid gray;
-    display: inline-block;
-    background: transparent;
-    overflow: hidden;
-}
-.html-element {
-    position: absolute;
-    /* Make sure events are propagated to the JointJS element so, e.g. dragging works.*/
-    pointer-events: none;
-    -webkit-user-select: none;
-    border-radius: 4px;
-    border: none;
-    z-index: 2;
-    .spine {
-        background: url(../images/spine.svg) no-repeat top left;
-        background-size: contain;
-        width: 100%;
-        height: 100%;
-    }
-}
+// @import '~@/assets/scss/topology';
+@import '~@/assets/scss/html';
 </style>

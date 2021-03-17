@@ -7,10 +7,7 @@ export function _init(graph, paper) {
         joint.shapes.html = {};
         joint.shapes.html.Element = joint.shapes.basic.Rect.extend({
             defaults: joint.util.deepSupplement({
-                type: 'html.Element',
-                attrs: {
-                    rect: { stroke: 'none', 'fill-opacity': 0 }
-                }
+                type: 'html.Element'
             }, joint.shapes.basic.Rect.prototype.defaults)
         });
     
@@ -28,7 +25,7 @@ export function _init(graph, paper) {
                 joint.dia.ElementView.prototype.initialize.apply(this, arguments);
                 this.$box = $(_.template(template)());
                 this.model.on('change', this.updateBox, this);
-                this.model.on('mouseover', this.showMetric);
+                this.$box.on('mouseover', this.showMetric);
                 this.updateBox();
             },
             render: function() {
@@ -51,6 +48,15 @@ export function _init(graph, paper) {
                 console.log(e);
             }
         });
+
+        paper.on('element:mouseover', function(e) {
+            
+        });
+
+        paper.on('element:mouseout',  function(e) {
+            console.log(e);
+        });
+
         const createMetricHtml = (metric) => {
             return [
                 '<div class="html-metric">',
