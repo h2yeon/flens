@@ -3,9 +3,8 @@
 </template>
 
 <script>
-import {defind_html} from '@/joint/joint.shapes.html.js';
-import {_init} from '@/joint/html.js'
-// import {_init} from '@/joint/topology.js';
+import {defind_html} from '@/joint/joint.shapes.device.js';
+import {_init} from '@/joint/topology.js';
 export default {
     name: "Topology",
     mounted() {
@@ -28,6 +27,5 @@ export default {
 </script>
 
 <style lang="scss">
-// @import '~@/assets/scss/topology';
-@import '~@/assets/scss/html';
+@import '~@/assets/scss/topology';
 </style>

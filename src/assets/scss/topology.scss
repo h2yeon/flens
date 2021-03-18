@@ -1,22 +1,21 @@
 $spine-img: '../images/spine.svg';
-$leaf-img: '';
-$host-img: '';
+$leaf-img: '../images/leaf.svg';
+$host-img: '../images/host.svg';
+$search-icon: '../images/search.svg';
+$chart-icon:'../images/chart.svg';
 
+html, body {
+    margin: 0;
+    padding: 0
+}
 #topology {
-    position: relative;
-    background: transparent;
     overflow: hidden;
     width: 100% !important;
     height: 100% !important;
 }
-.html-element {
+.device-container {
     position: absolute;
-    pointer-events: none;
-    -webkit-user-select: none;
-    border-radius: 4px;
-    border: none;
-    z-index: 2;
-    &-img {
+    .device-img {
         width: 100%;
         height: 100%;
     }
@@ -32,25 +31,118 @@ $host-img: '';
         background: url($host-img) no-repeat top left;
         background-size: contain;
     }
-    .html-metric {
-        position: relative;
-        .metric {
-            position: absolute;
-            left: 100px;
-            top: 0px;
-            width: 230px;
-            border: 1px solid lightgrey;
-            height: 190px;
+    
+    .appear {
+        animation: fade-in 0.6s;
+        animation-fill-mode: forwards;
+      }
+      
+      .disappear {
+        animation: fade-out 0.6s;
+        animation-fill-mode: forwards;
+      }
+      
+      @keyframes fade-in {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      
+      @keyframes fade-out {
+        from {
+          opacity: 1;
+      
+        }
+        to {
+          opacity: 0;
+        }
+      }
+    .device-popup {
+        display: none;
+        box-sizing: border-box;
+        font-family: sans-serif;
+        box-shadow: 4px 4px 4px -1px rgba(0,0,0,0.18), -2px -2px 4px -1px rgba(0,0,0,0.18);
+        padding: 8px 16px;
+        background-color: #FCFCFC;
+        width: 250px;
+        height: 265px;
+        left: 55px;
+        top: -205px;
+        border-radius: 5px;
+        font-size: 18px;
+        &-field {
+            width: 100%;
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+            padding: 2px;
+            margin: 5px 0;
+            background: #FFFFFF;
+            text-align: left;
+            letter-spacing: 0;
+            color: #222222;
+            border-radius: 0px;
+            justify-content: space-between;
+            display: flex;
+        }
+        &-header {
+            font-weight: bold;
+            border-top: 1px solid lightgrey;
+            border-bottom: 1px solid lightgrey;
+            width: 100%;
             padding: 5px;
-            &-item {
-                justify-content: space-between;
-                display: flex; 
-            }
-            &-hop-latency {
-                display: block;   
-            }
+            margin: 0;
+            text-align: left;
         }
     }
-    .temp {
+    .device-tool-icon {
+        position: absolute;
+        left: 175px;
+        top: 230px;
+        display: flex;
+        justify-content: space-between;
+        &-chart {
+            width: 25px; 
+            height: 25px;
+            background: url($chart-icon) no-repeat top left;
+            background-size: contain;
+            margin-right: 10px;
+        }
+        &-search {
+            width: 25px; 
+            height: 25px;
+            background: url($search-icon) no-repeat top left;
+            background-size: contain;
+        }
+    }
+    /* Toolbar */
+    .toolbar {
+        position: absolute;
+        width: 300px;
+        left: calc(50% - 150px);
+        top: 18px;
+        text-align: center;
+    }
+    .toolbar-button {
+        outline: none;
+        background: #FFFFFF;
+        border: 1px solid #E0E0E0;
+        border-radius: 16px;
+        text-align: center;
+        font-family: sans-serif;
+        font-size: 12px;
+        padding: 6px 12px;
+        letter-spacing: 0.25px;
+        color: #222222;
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none
+    }
+    .toolbar-button:hover {
+        background: #F7F8F9;
     }
 }
