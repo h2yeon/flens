@@ -1,11 +1,4 @@
-window.$ = require('jquery');
-window.joint = require('jointjs');
-window.dagre = require('dagre');
-window.graphlib = require('graphlib');
-window.util = joint.util;
-window.V = joint.V; 
-
- export function defind_html() {
+export function defind_html() {
     var Element = joint.dia.Element;
     var ElementView = joint.dia.ElementView;
 
@@ -203,11 +196,16 @@ window.V = joint.V;
         },
 
         renderHTMLMarkup: function() {
-            var doc = util.parseDOMJSON(this.model.htmlMarkup, V.namespace.xhtml);
+            var doc = joint.util.parseDOMJSON(this.model.htmlMarkup, joint.V.namespace.xhtml);
             var html = doc.selectors.htmlRoot;
             var fields = doc.groupSelectors.field;
             var metrics = doc.groupSelectors.metric;
+            var searchIcon = doc.querySelector.searchIcon;
+            var chartIcon = doc.querySelector.chartIcon;
             this.paper.htmlContainer.appendChild(doc.fragment);
+            html.addEventListener('mouseover', this.showPopup);
+            html.addEventListener('mouseout', this.hidePopup);
+            searchIcon.addEventListener('click', this.)
             this.html = html;
             this.fields = fields;
             this.metrics = metrics;
@@ -263,6 +261,18 @@ window.V = joint.V;
 
         onRemove: function() {
             this.removeHTMLMarkup();
+        },
+        showPopup: function() {
+            var popup = this.lastChild;
+            popup.style.display = 'block';
+            popup.classList.remove('disappear');
+            popup.classList.add('appear');
+        },
+        hidePopup: function() {
+            var popup = this.lastChild;
+            popup.style.display = 'none';
+            popup.classList.add('disappear');
+            popup.classList.remove('appear');
         }
     });
 
