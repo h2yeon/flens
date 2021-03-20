@@ -11,12 +11,12 @@ window.graphlib = require('graphlib');
 export default {
     name: "Topology",
     mounted() {
-        defind_html();
         this.graph = new joint.dia.Graph;
         this.paper = new joint.dia.Paper({
             el: $('#topology'),
             model: this.graph
         });
+        defind_html(this);
         this.topology_init();
         this.addEvent();
     },
@@ -107,8 +107,20 @@ export default {
         addEvent() {
             this.paper.on('blank:pointerdown cell:pointerdown', function(elementView, event) {
                 document.activeElement.blur();
-                $(elementView.html).find('.device-popup').css('display', 'none');
+                var devicePopup = $(elementView.html).find('.device-popup');
+                if(devicePopup.css('display') !== 'none') {
+                    devicePopup.css('display', 'none'); 
+                }
             });
+            this.paper.on('blank:pointerup cell:pointerup', function(elementView, event) {
+                document.activeElement.blur();
+                var devicePopup = $(elementView.html).find('.device-popup');
+                if(devicePopup.css('display') === 'none') {
+                    devicePopup.css('display', 'block'); 
+                }
+            });
+        },
+        search: function(modelId) {
         }
     }
 }

@@ -1,4 +1,4 @@
-export function defind_html() {
+export function defind_html(vue) {
     var Element = joint.dia.Element;
     var ElementView = joint.dia.ElementView;
 
@@ -128,18 +128,16 @@ export function defind_html() {
                     className: 'device-tool-icon',
                     children: [{
                         tagName: 'div',
-                        querySelector: 'chartIcon', 
+                        selector: 'chartIcon', 
                         className: 'device-tool-icon-chart',
                         style: {
-                            'pointer-events': 'auto',
                             'cursor':'pointer'
                         }
                     },{
                         tagName: 'div',
-                        querySelector: 'searchIcon', 
+                        selector: 'searchIcon', 
                         className: 'device-tool-icon-search',
                         style: {
-                            'pointer-events': 'auto',
                             'cursor':'pointer'
                         }
                     }]
@@ -200,12 +198,12 @@ export function defind_html() {
             var html = doc.selectors.htmlRoot;
             var fields = doc.groupSelectors.field;
             var metrics = doc.groupSelectors.metric;
-            var searchIcon = doc.querySelector.searchIcon;
-            var chartIcon = doc.querySelector.chartIcon;
+            var searchIcon = doc.selectors.searchIcon;
+            var chartIcon = doc.selectors.chartIcon;
             this.paper.htmlContainer.appendChild(doc.fragment);
             html.addEventListener('mouseover', this.showPopup);
             html.addEventListener('mouseout', this.hidePopup);
-            searchIcon.addEventListener('click', this.)
+            searchIcon.addEventListener('mousedown', this.clickSearch);  
             this.html = html;
             this.fields = fields;
             this.metrics = metrics;
@@ -273,6 +271,11 @@ export function defind_html() {
             popup.style.display = 'none';
             popup.classList.add('disappear');
             popup.classList.remove('appear');
+        },
+        clickSearch: function(event) {
+            event.stopPropagation();
+            var modelId = $(this.closest('.device-container')).attr('model-id');
+            vue.search(modelId);
         }
     });
 
