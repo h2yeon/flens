@@ -1,6 +1,6 @@
 $spine-img: '../images/spine.svg';
 $leaf-img: '../images/leaf.svg';
-$host-img: '../images/host.svg';
+$controller-img: '../images/controller.svg';
 $search-icon: '../images/search.svg';
 $chart-icon:'../images/chart.svg';
 
@@ -27,8 +27,8 @@ html, body {
         background: url($leaf-img) no-repeat top left;
         background-size: contain;
     }
-    .host {
-        background: url($host-img) no-repeat top left;
+    .controller {
+        background: url($controller-img) no-repeat top left;
         background-size: contain;
     }
     

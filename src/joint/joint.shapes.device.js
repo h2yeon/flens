@@ -5,9 +5,11 @@ export function defind_html(vue) {
     Element.define('html.Element', {
         size: { width: 80, height: 80 },
         fields: {
-            type: '',
-            name: ''
+            name: '',
+            role: '',
         },
+        inPorts: [],
+        outPorts: [],
         metrics: {
             hopLatency: '',
             queueCongestion: '',
@@ -19,7 +21,8 @@ export function defind_html(vue) {
                 refWidth: '100%',
                 refHeight: '100%',
                 fill: 'transparent'
-            }
+            },
+
         }
     }, {
         markup: [{
@@ -35,7 +38,7 @@ export function defind_html(vue) {
                 className: 'device-img',
                 groupSelector: 'field',
                 attributes: {
-                    'data-attribute': 'type'
+                    'data-attribute': 'role'
                 }
             },{
                 tagName: 'div',
@@ -234,7 +237,7 @@ export function defind_html(vue) {
                 var value = this.model.prop(['fields', attribute]);
                 switch(field.className.toUpperCase()) {
                     case 'DEVICE-IMG' :
-                        field.classList.add(value);
+                        field.classList.add(value.toLowerCase());
                         return;
                     case 'DEVICE-POPUP-VALUE' : 
                         field.textContent = value;
@@ -274,8 +277,8 @@ export function defind_html(vue) {
         },
         clickSearch: function(event) {
             event.stopPropagation();
-            var modelId = $(this.closest('.device-container')).attr('model-id');
-            vue.search(modelId);
+            // var modelId = $(this.closest('.device-container')).attr('model-id');
+            // vue.search(modelId);
         }
     });
 

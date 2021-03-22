@@ -4,7 +4,7 @@
             <topology/>
         </div>
         <div class="item searchDetail">
-            <search-detail/>
+            <!-- <search-detail/> -->
         </div>
     </div>
 </template>
@@ -34,7 +34,7 @@ export default {
     .topology {
         grid-column-end: span 2;
     }
-    .searchDetail {
-    }
+    // .searchDetail {
+    // }
 }
 </style>

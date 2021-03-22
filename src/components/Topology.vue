@@ -4,6 +4,7 @@
 
 <script>
 import {defind_html} from '@/joint/joint.shapes.device.js';
+import axios from 'axios';
 window.$ = require('jquery');
 window.joint = require('jointjs');
 window.dagre = require('dagre');
@@ -34,48 +35,62 @@ export default {
             htmlContainer.style.inset = '0';
             this.paper.el.appendChild(htmlContainer);
             this.paper.htmlContainer = htmlContainer;
-            var el1 = new joint.shapes.html.Element({
-                fields: {
-                    name: '1234',
-                    type: 'spine'
-                },
-                metrics: {
-                    hopLatency: '1',
-                    queueCongestion: '2',
-                    pps: '3',
-                    throughput: '4'
-                }
-            });
-
-            var el2 = new joint.shapes.html.Element({
-                fields: {
-                    name: '1234',
-                    type: 'leaf'
-                },
-                metrics: {
-                    hopLatency: '1',
-                    queueCongestion: '2',
-                    pps: '3',
-                    throughput: '4'
-                }
-            });
-
-            var el3 = new joint.shapes.html.Element({
-                fields: {
-                    name: '1234',
-                    type: 'host'
-                },
-                metrics: {
-                    hopLatency: '',
-                    queueCongestion: '',
-                    pps: '',
-                    throughput: ''
-                }
-            });
             
-            var l1 = this.connect(el1, el2, true);
-            var l2 = this.connect(el1, el3);
-            this.graph.addCells([el1, el2, el3, l1, l2]);
+            const vm = this;
+            axios.get('/api/nodedef')
+                .then(function(response) {
+                    vm.createCells(response.data);
+                })
+                .catch(function(error) {
+                    console.log(error);
+                });
+            
+            
+        },
+        createCells(result) {
+            let graphCells = [];
+            result.forEach(data => {
+                var inPorts = [];
+                for(var port in data.tp_list) {
+                    inPorts.push(port);
+                }
+                var cell = new joint.shapes.html.Element({
+                    fields: {
+                        name: data.dev_name,
+                        role: data.dev_role,
+                    },
+                    metrics: {
+                        hopLatency: '1',
+                        queueCongestion: '2',
+                        pps: '3',
+                        throughput: '4'
+                    },
+                    inPorts: inPorts,
+                });
+                inPorts.forEach(port => {
+                    cell.addPort({
+                        group: 'port',
+                        args: { x: 0, y: 0 },
+                        id: port,
+                        size: { height: 5 || 0, width:5 || 0 }
+                    })
+                })
+                cell.device_id = data.id;
+                graphCells.push(cell);
+            })
+            this.graph.addCells(graphCells);
+            
+            const vm = this;
+            axios.get('/api/link')
+                .then(function(response) {
+                    vm.createLinks(response.data);
+                })
+                .catch(function(error) {
+                    console.log(error);
+                });
+        },
+        createLinks(result) {
+            debugger;
             joint.layout.DirectedGraph.layout(this.graph, {
             nodeSep: 400,
             rankSep: 200,
@@ -83,6 +98,8 @@ export default {
             marginY: 200,
             rankDir: "TB"
             });
+            this.paper.fitToContent({maxWidth:this.$el.clientWidth, minHeight: this.$el.clientHeight,  
+            useModelGeometry: true})
         },
         connect(source, target, hasPort) {
             var l = new joint.shapes.standard.Link();
