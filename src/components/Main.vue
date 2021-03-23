@@ -4,7 +4,7 @@
             <topology/>
         </div>
         <div class="item searchDetail">
-            <!-- <search-detail/> -->
+            <search-detail/>
         </div>
     </div>
 </template>
@@ -23,18 +23,12 @@ export default {
 
 <style lang="scss">
 .flens-container {
-    display: grid;
-    grid-template-columns: auto auto auto auto;
-    grid-gap: 10px;
+    display: flex;
     min-height: 66rem;
-    .item {
-        justify-content: center;
-        align-items: center;
-    }
-    .topology {
-        grid-column-end: span 2;
-    }
-    // .searchDetail {
-    // }
+    .item:nth-child(1) { 
+	    flex-shrink: 0;
+	    width: 1200px; }
+    .item:nth-child(2) { flex-grow: 1; }
+    
 }
 </style>

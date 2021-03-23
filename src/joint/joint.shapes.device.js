@@ -8,8 +8,6 @@ export function defind_html(vue) {
             name: '',
             role: '',
         },
-        inPorts: [],
-        outPorts: [],
         metrics: {
             hopLatency: '',
             queueCongestion: '',
@@ -20,10 +18,9 @@ export function defind_html(vue) {
             placeholder: {
                 refWidth: '100%',
                 refHeight: '100%',
-                fill: 'transparent'
+                fill: 'transparent',
             },
-
-        }
+        },
     }, {
         markup: [{
             tagName: 'rect',
@@ -211,6 +208,7 @@ export function defind_html(vue) {
             this.fields = fields;
             this.metrics = metrics;
             html.setAttribute('model-id', this.model.id);
+            html.setAttribute('device-id', this.model.attributes.device_id);
         },
 
         removeHTMLMarkup: function() {
@@ -264,12 +262,14 @@ export function defind_html(vue) {
             this.removeHTMLMarkup();
         },
         showPopup: function() {
+            $(this).closest('.device-container').addClass('popup');
             var popup = this.lastChild;
             popup.style.display = 'block';
             popup.classList.remove('disappear');
             popup.classList.add('appear');
         },
         hidePopup: function() {
+            $(this).closest('.device-container').removeClass('popup');
             var popup = this.lastChild;
             popup.style.display = 'none';
             popup.classList.add('disappear');
