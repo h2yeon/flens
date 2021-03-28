@@ -7,7 +7,7 @@
                             v-for="(option,index) in searchTypeOptions" 
                             :key="index"
                             :value="option.value">
-                            {{option.text}}
+                            {{option.label}}
                         </option>
                 </select>
             </div>
@@ -35,7 +35,7 @@
                             v-for="(option,index) in ppsOptions" 
                             :key="index"
                             :value="option.value">
-                            {{option.text}}
+                            {{option.label}}
                         </option>
                 </select>
             </div>
@@ -45,7 +45,7 @@
                             v-for="(option,index) in orderOptions" 
                             :key="index"
                             :value="option.value">
-                            {{option.text}}
+                            {{option.label}}
                         </option>
                 </select>
             </div>
@@ -58,14 +58,17 @@
         </div>
         <div class='result'>
             <div>
-                <select v-model="selectedSearchType" class='setTimer' >
-                    <option 
-                        v-for="(option,index) in searchTypeOptions" 
-                        :key="index"
-                        :value="option.value">
-                        {{option.text}}
-                    </option>
-                </select>
+                <div class="setTimer">
+                    <span class="clock"></span>
+                    <select v-model="selectedTimeOut">
+                        <option 
+                            v-for="(option,index) in timeOutOptions" 
+                            :key="index"
+                            :value="option.value">
+                            {{option.label}}
+                        </option>
+                    </select>
+                </div>
             </div>
         </div>
     </div>
@@ -79,9 +82,9 @@ export default {
         return {
             selectedSearchType: searchType.FLOW,
             searchTypeOptions: [
-                {text: 'Device', value: searchType.DEVICE},
-                {text: 'Flow', value: searchType.FLOW},
-                {text: 'Link', value: searchType.LINK}  
+                {label: 'Device', value: searchType.DEVICE},
+                {label: 'Flow', value: searchType.FLOW},
+                {label: 'Link', value: searchType.LINK}  
             ],
             searchRequirements: [
                 {label:"Src IP", value: this.srcIp},
@@ -90,16 +93,22 @@ export default {
             ],
             selectedPPS: 'PPS',
             ppsOptions: [
-                {text: 'PPS', value: 'PPS'}
+                {label: 'PPS', value: 'PPS'}
             ],
             selectedOrder: 'ascending',
             orderOptions: [
-                {text: 'Ascending Order', value: 'ascending'}
+                {label: 'Ascending Order', value: 'ascending'}
             ],
             srcIp:'',
             distIp: '',
             protocol: '',
-            timeOut: 100,
+            timeOut: 1000,
+            timeOutOptions: [
+                {label: 'Last 1 sec', value: 1},                
+                {label: 'Last 1 min', value: 60},                
+                {label: 'Last 10 mins', value: 6000},
+            ],
+            selectedTimeOut: 6000
         }
     }
 }
@@ -167,21 +176,38 @@ export default {
     height: 80%;
     div {
         position: relative;
+        display: flex;
+        justify-content: flex-end;
         .setTimer {
-            position: absolute;
-            width: 200px;
+            width: 220px;
+            height: 35px;
             right: 10px;
             top: 50rem;
-            padding: .375rem .75rem;
             font-size: 1rem;
             font-weight: 400;
             line-height: 1.5;
             color: black;
             background-color: #fff;
             background-clip: padding-box;
+            transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
             border: 1px solid #ced4da;
             border-radius: .25rem;
-            transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+            .clock {
+                background: url('../images/clock.png') no-repeat top left;
+                background-size: contain;
+                width: 25px;
+                height: 25px;
+                margin-top: 5px;
+                margin-right: 5px;
+            }
+            select {
+                min-width: 180px;
+                padding: .375rem .75rem;
+                border: none;
+                &:focus {
+                    outline: 0;
+                }
+            }
         }
     }
 }

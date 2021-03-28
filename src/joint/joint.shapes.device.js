@@ -1,18 +1,22 @@
-export function defind_html(vue) {
+export function define_html(vue) {
     var Element = joint.dia.Element;
     var ElementView = joint.dia.ElementView;
 
     Element.define('html.Element', {
-        size: { width: 80, height: 80 },
+        size: { width: 100, height: 100 },
         fields: {
             name: '',
             role: '',
         },
         metrics: {
-            hopLatency: '',
-            queueCongestion: '',
-            pps: '',
-            throughput: ''
+            from: '',
+            to: '',
+            dropPacketCount: '',
+            dropBytes: '',
+            rxPacketCount: '',
+            rxBytes: '',
+            txPacketCount: '',
+            txBytes: ''
         },
         attrs: {
             placeholder: {
@@ -21,6 +25,7 @@ export function defind_html(vue) {
                 fill: 'transparent',
             },
         },
+        tp_list: [],
     }, {
         markup: [{
             tagName: 'rect',
@@ -70,13 +75,13 @@ export function defind_html(vue) {
                     children: [{
                         tagName: 'div',
                         className: 'device-popup-label',
-                        textContent: 'hopLatency',
+                        textContent: '시작시간',
                     },{
                         tagName: 'div',
                         className: 'device-popup-value',
                         groupSelector: 'metric',
                         attributes: {
-                            'data-attribute': 'hopLatency'
+                            'data-attribute': 'from'
                         }
                     }]},{
                     tagName: 'div',
@@ -84,13 +89,13 @@ export function defind_html(vue) {
                     children: [{
                         tagName: 'div',
                         className: 'device-popup-label',
-                        textContent: 'queueCongestion',
+                        textContent: '종료시간',
                     },{
                         tagName: 'div',
                         className: 'device-popup-value',
                         groupSelector: 'metric',
                         attributes: {
-                            'data-attribute': 'queueCongestion'
+                            'data-attribute': 'to'
                         }
                     }]
                 },{
@@ -99,13 +104,13 @@ export function defind_html(vue) {
                     children: [{
                         tagName: 'div',
                         className: 'device-popup-label',
-                        textContent: 'pps',
+                        textContent: 'drop 패킷 수',
                     },{
                         tagName: 'div',
                         className: 'device-popup-value',
                         groupSelector: 'metric',
                         attributes: {
-                            'data-attribute': 'pps'
+                            'data-attribute': 'dropPacketCount'
                         }
                     }]
                 },{
@@ -114,13 +119,73 @@ export function defind_html(vue) {
                     children: [{
                         tagName: 'div',
                         className: 'device-popup-label',
-                        textContent: 'throughput',
+                        textContent: 'drop Bytes',
                     },{
                         tagName: 'div',
                         className: 'device-popup-value',
                         groupSelector: 'metric',
                         attributes: {
-                            'data-attribute': 'throughput'
+                            'data-attribute': 'dropBytes'
+                        }
+                    }]
+                },{
+                    tagName: 'div',
+                    className: 'device-popup-field',
+                    children: [{
+                        tagName: 'div',
+                        className: 'device-popup-label',
+                        textContent: 'rx 패킷 수',
+                    },{
+                        tagName: 'div',
+                        className: 'device-popup-value',
+                        groupSelector: 'metric',
+                        attributes: {
+                            'data-attribute': 'rxPacketCount'
+                        }
+                    }]
+                },{
+                    tagName: 'div',
+                    className: 'device-popup-field',
+                    children: [{
+                        tagName: 'div',
+                        className: 'device-popup-label',
+                        textContent: 'rx Bytes',
+                    },{
+                        tagName: 'div',
+                        className: 'device-popup-value',
+                        groupSelector: 'metric',
+                        attributes: {
+                            'data-attribute': 'rxBytes'
+                        }
+                    }]
+                },{
+                    tagName: 'div',
+                    className: 'device-popup-field',
+                    children: [{
+                        tagName: 'div',
+                        className: 'device-popup-label',
+                        textContent: 'tx 패킷 수',
+                    },{
+                        tagName: 'div',
+                        className: 'device-popup-value',
+                        groupSelector: 'metric',
+                        attributes: {
+                            'data-attribute': 'txPacketCount'
+                        }
+                    }]
+                },{
+                    tagName: 'div',
+                    className: 'device-popup-field',
+                    children: [{
+                        tagName: 'div',
+                        className: 'device-popup-label',
+                        textContent: 'tx Bytes',
+                    },{
+                        tagName: 'div',
+                        className: 'device-popup-value',
+                        groupSelector: 'metric',
+                        attributes: {
+                            'data-attribute': 'txBytes'
                         }
                     }]
                 },{
@@ -143,7 +208,7 @@ export function defind_html(vue) {
                     }]
                 }]
              }]
-        }]
+        }],
     });
 
     // Custom view for JointJS HTML element that displays an HTML <div></div> above the SVG Element.
@@ -202,13 +267,14 @@ export function defind_html(vue) {
             var chartIcon = doc.selectors.chartIcon;
             this.paper.htmlContainer.appendChild(doc.fragment);
             html.addEventListener('mouseover', this.showPopup);
-            html.addEventListener('mouseout', this.hidePopup);
+            html.addEventListener('mouseleave', this.hidePopup);
             searchIcon.addEventListener('mousedown', this.clickSearch);  
+            chartIcon.addEventListener('mousedown', this.clickChart);  
             this.html = html;
             this.fields = fields;
             this.metrics = metrics;
             html.setAttribute('model-id', this.model.id);
-            html.setAttribute('device-id', this.model.attributes.device_id);
+            html.setAttribute('device-id', this.model.device_id);
         },
 
         removeHTMLMarkup: function() {
@@ -262,11 +328,7 @@ export function defind_html(vue) {
             this.removeHTMLMarkup();
         },
         showPopup: function() {
-            $(this).closest('.device-container').addClass('popup');
-            var popup = this.lastChild;
-            popup.style.display = 'block';
-            popup.classList.remove('disappear');
-            popup.classList.add('appear');
+            vue.setMetricInfo(this);
         },
         hidePopup: function() {
             $(this).closest('.device-container').removeClass('popup');
@@ -279,6 +341,11 @@ export function defind_html(vue) {
             event.stopPropagation();
             // var modelId = $(this.closest('.device-container')).attr('model-id');
             // vue.search(modelId);
+        },
+        clickChart: function(event) {
+            event.stopPropagation();
+            var modelId = $(this.closest('.device-container')).attr('model-id');
+            vue.openELKWindow(modelId);
         }
     });
 
