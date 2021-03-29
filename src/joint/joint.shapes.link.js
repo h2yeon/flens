@@ -1,13 +1,14 @@
 export function define_link() {
-    var Link = joint.dia.Link;
-    var LinkView = joint.dia.LinkView;
-    Link.define('standard.Link', {
+    joint.shapes.standard.Link.define('examples.CustomLink', {
         attrs: {
             line: {
                 connection: { stubs: 0 },
                 fill: 'none',
                 stroke: 'black',
-                strokeWidth: 2
+                strokeWidth: 2,
+                targetMarker: {
+                    type: 'ellipse',
+                }
             },
             endReferenceBody: {
                 r: 5,
@@ -43,11 +44,4 @@ export function define_link() {
             }]
         }]
     });
-
-    joint.shapes.standard.Link.LinkView = LinkView.extend({
-        onRender: function() {
-            console.log('a');
-            return this;
-        }
-    })
 }

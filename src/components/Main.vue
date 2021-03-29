@@ -24,10 +24,10 @@ export default {
 <style lang="scss">
 .flens-container {
     display: flex;
-    min-height: 66rem;
+    min-height: 60rem;
     .item:nth-child(1) { 
 	    flex-shrink: 0;
-	    width: 1200px; }
+	    width: 1050px; }
     .item:nth-child(2) { flex-grow: 1; }
     
 }

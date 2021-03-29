@@ -18,7 +18,6 @@
                 <div class="link-popup-value"></div>
             </div>
             <div class="link-tool-icon">
-                <div class="link-tool-icon-chart"></div>
                 <div class="link-tool-icon-search"></div>
             </div>
         </div>
@@ -92,8 +91,8 @@ export default {
             model: this.graph,
             width: this.width,
             height: this.$el.clientHeight,
-            marginX: 200,
-            marginY: 200,
+            marginX: 100,
+            marginY: 100,
             gridSize: 1
         });
         define_html(this);
@@ -106,9 +105,9 @@ export default {
             graph: null,
             paper: null,
             deviceType: deviceType,
-            spine: {x: 0, y: 200},
-            leaf: {x: 0, y: 500},
-            controller: {x: 0, y:800},
+            spine: {x: 0, y: 120},
+            leaf: {x: 0, y: 400},
+            controller: {x: 0, y:680},
             width: 0,
             linkPopupPosition: {
                 x: 0,
@@ -226,7 +225,7 @@ export default {
                 sourceOption = 'top';
                 targetOption = 'bottom';
             }
-            var l = new joint.shapes.standard.Link();
+            var l = new joint.shapes.examples.CustomLink();
             l.source(source, {
                 anchor: { name: sourceOption}
             })
@@ -253,6 +252,8 @@ export default {
             });
             this.paper.on('link:mouseenter', function(elementView, event) {
                 if(event.target.tagName === 'circle') {
+                    vm.selectSourceTp = '';
+                    vm.selectTargetTp = '';
                     vm.portPopupPosition.x = event.clientX;
                     vm.portPopupPosition.y = event.clientY;
                     let portPopup = $(vm.$refs.portPopup).closest('.port-popup');
@@ -306,7 +307,7 @@ export default {
         getPosition(result, role) {
             let deviceType = this.deviceType;
             let length = result.filter(data => data.dev_role === role).length; 
-            let width = Math.floor(this.width/(length+1)) - 40;
+            let width = Math.floor(this.width/(length+1)) - 20;
             let x, y;
             switch(role) {
                 case deviceType.SPINE:

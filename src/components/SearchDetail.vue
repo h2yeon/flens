@@ -133,13 +133,13 @@ export default {
         display: flex;
         justify-content: space-between;
         .form-control {
-            margin-right: 10px;
             display: block;
+            margin: 0 5px;
             width: 100%;
             padding: .375rem .75rem;
             font-size: 1rem;
             font-weight: 400;
-            line-height: 1.5;
+            line-height: 1;
             color: #212529;
             background-color: #fff;
             background-clip: padding-box;
@@ -149,7 +149,7 @@ export default {
         }
         button {
             margin: 0 10px 5px 10px; 
-            width: 150px;
+            width: 100%;
             height: 100%;
             display: inline-block;
             color: white;
@@ -164,7 +164,7 @@ export default {
             border: 1px solid transparent;
             padding: .375rem .75rem;
             font-size: 1rem;
-            line-height: 1.5;
+            line-height: 1;
             border-radius: .25rem;
             transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
         }
@@ -182,10 +182,10 @@ export default {
             width: 220px;
             height: 35px;
             right: 10px;
-            top: 50rem;
+            top: 45rem;
             font-size: 1rem;
             font-weight: 400;
-            line-height: 1.5;
+            line-height: 1;
             color: black;
             background-color: #fff;
             background-clip: padding-box;
