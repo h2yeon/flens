@@ -328,23 +328,6 @@ export default {
             }
             return {x: x, y: y}
         },
-        getPort(role) {
-            let inPorts = [];
-            let outPorts = [];
-            switch(role) {
-                case deviceType.SPINE:
-                    inPorts.push('in');
-                    break;
-                case deviceType.LEAF: 
-                    inPorts.push('in');
-                    outPorts.push('out');
-                    break;
-                case deviceType.CONTROLLER: 
-                    outPorts.push('out');
-                    break;
-            }
-            return {inPorts: inPorts, outPorts: outPorts}
-        },
         setMetricInfo(container) {
             let cell = this.graph.getCell(container.getAttribute('model-id'));
             const vm = this;
