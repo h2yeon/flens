@@ -1,12 +1,14 @@
 <template>
-    <div class="flens-container">
-        <div class="item topology">
-            <topology/>
-        </div>
-        <div class="item searchDetail">
-            <search-detail/>
-        </div>
-    </div>
+    <b-container class="flens-container" fluid>
+        <b-row align-v="stretch">
+            <b-col cols="6" class="topology">
+                <topology/>
+            </b-col>
+            <b-col class="searchDetail">
+                <search-detail/>
+            </b-col>
+        </b-row>
+    </b-container>
 </template>
 
 <script>
@@ -23,12 +25,6 @@ export default {
 
 <style lang="scss">
 .flens-container {
-    display: flex;
     min-height: 60rem;
-    .item:nth-child(1) { 
-	    flex-shrink: 0;
-	    width: 1050px; }
-    .item:nth-child(2) { flex-grow: 1; }
-    
 }
 </style>

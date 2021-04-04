@@ -37,14 +37,8 @@
             <div class="port-popup-field">
                 <div class="port-popup-label">Source TP</div>
                 <div class="port-popup-value">
-                    <select class='form-control' v-model="selectSourceTp">
-                        <option 
-                            v-for="(option,index) in sourceTp" 
-                            :key="index"
-                            :value="option.value">
-                            {{option.label}}
-                        </option>
-                    </select>
+                    <b-form-select v-model="selectSourceTp" :options="sourceTp">
+                    </b-form-select>
                 </div>
             </div>
             <div class="port-popup-field">
@@ -54,14 +48,8 @@
             <div class="port-popup-field">
                 <div class="port-popup-label">Target TP</div>
                 <div class="port-popup-value">  
-                    <select class='form-control' v-model="selectTargetTp">
-                        <option 
-                            v-for="(option,index) in targetTp" 
-                            :key="index"
-                            :value="option.value">
-                            {{option.label}}
-                        </option>
-                    </select>
+                    <b-form-select v-model="selectTargetTp" :options="targetTp">
+                    </b-form-select>
                 </div>
             </div>
             <div class="port-tool-icon">
@@ -76,11 +64,13 @@
 import {define_html} from '@/joint/joint.shapes.device.js';
 import {define_link} from '@/joint/joint.shapes.link.js';
 import {deviceType} from '@/data/type/deviceType.js';
+import {APIHelper} from '@/APIHelper.js'
 import axios from 'axios';
 window.$ = require('jquery');
 window.joint = require('jointjs');
 window.dagre = require('dagre');
 window.graphlib = require('graphlib');
+window.apiHelper = new APIHelper();
 export default {
     name: "Topology",
     mounted() {
@@ -146,6 +136,7 @@ export default {
             this.paper.htmlContainer.appendChild(this.$refs.linkPopup);
             this.paper.htmlContainer.appendChild(this.$refs.portPopup);
             const vm = this;
+            let params = apiHelper.getNodeDef();
             axios.get('/api/nodedef')
                 .then(function(response) {
                     vm.createCells(response.data);
@@ -266,8 +257,8 @@ export default {
                     let source = vm.source;
                     vm.sourceId = source.device_id;
                     vm.sourceTp = source.attributes.tp_list.filter(tp => tp.dev_id === source.device_id && tp.tar[0] !== undefined).map(tp => ({
-                        label: tp.tp,
-                        value: tp.tp
+                        value: tp.tp,
+                        text: tp.tp
                     }));
                     vm.targetId = vm.target.device_id;
                     portPopup.addClass(['popup', 'appear'])
@@ -332,7 +323,7 @@ export default {
             let cell = this.graph.getCell(container.getAttribute('model-id'));
             const vm = this;
             if(!$(container).closest('.device-container').hasClass('popup')) {
-                axios.get('api/metric/', {params: {device_id: container.getAttribute('device-id')}})
+                axios.post('api/metric/', {params: apiHelper.getDeviceMetricParam(container.getAttribute('device-id'))})
                     .then(function(response) {
                         cell.attributes.metrics = response.data[0];
                         vm.paper.findViewByModel(cell).updateMetrics();
@@ -448,18 +439,10 @@ $chart-icon:'../images/chart.svg';
       }
     .link-tool-icon {
         position: absolute;
-        left: 230px;
+        left: 265px;
         top: 165px;
         display: flex;
         justify-content: space-between;
-        &-chart {
-            width: 25px; 
-            height: 25px;
-            background: url($chart-icon) no-repeat top left;
-            background-size: contain;
-            margin-right: 10px;
-            cursor: pointer;
-        }
         &-search {
             width: 25px; 
             height: 25px;
@@ -503,12 +486,6 @@ $chart-icon:'../images/chart.svg';
           padding: 5px 0;
           margin: 0;
           text-align: left;
-      }
-      &-value {
-          select {
-            min-width: 150px;
-            min-height: 25px;
-          }
       }
     .port-tool-icon {
         position: absolute;

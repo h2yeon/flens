@@ -1,77 +1,59 @@
 <template>
-    <div class='container'>
-        <div class='row'>
-            <div class='col'>
-                <select class='form-control' v-model="selectedSearchType">
-                        <option 
-                            v-for="(option,index) in searchTypeOptions" 
-                            :key="index"
-                            :value="option.value">
-                            {{option.label}}
-                        </option>
-                </select>
-            </div>
-            <div class='col'>
-                <label class='form-control'>Src Ip</label>
-                <input class='form-control'  :v-model="srcIp" type="text">
-            </div>
-            <div class='col'>
-                <label class='form-control'>Dist Ip</label>
-                <input class='form-control'  :v-model="distIp" type="text">
-            </div>
-            <div class='col'>
-                <label class='form-control'>Proto</label>
-                <input class='form-control'  :v-model="protocol" type="text">
-            </div>
-            <div class='col'>
-                <button>Search</button>
-            </div>
-        </div>
-        <div class='row'>
-            <div class='col'></div>
-            <div class='col'>
-                <select class='form-control' v-model="selectedPPS">
-                        <option 
-                            v-for="(option,index) in ppsOptions" 
-                            :key="index"
-                            :value="option.value">
-                            {{option.label}}
-                        </option>
-                </select>
-            </div>
-            <div class='col'>
-                <select class='form-control' v-model="selectedOrder">
-                        <option 
-                            v-for="(option,index) in orderOptions" 
-                            :key="index"
-                            :value="option.value">
-                            {{option.label}}
-                        </option>
-                </select>
-            </div>
-            <div class='col'>
-                <input class='form-control'  v-model="timeOut" type="number">
-            </div>
-            <div class='col'>
-                <button>Metric Filter</button>
-            </div>
-        </div>
-        <div class='result'>
-            <div>
-                <div class="setTimer">
-                    <span class="clock"></span>
-                    <select v-model="selectedTimeOut">
-                        <option 
-                            v-for="(option,index) in timeOutOptions" 
-                            :key="index"
-                            :value="option.value">
-                            {{option.label}}
-                        </option>
-                    </select>
+    <b-container fluid class="mt-3">
+        <b-row class="mb-2">
+            <b-col>
+                <b-form-select v-model="selectedSearchType" :options="searchTypeOptions">
+                </b-form-select>
+            </b-col>
+            <b-col>
+                <b-form-input id="input-srcip" v-model="srcIp" type="text" placeholder="Src Ip"></b-form-input>
+            </b-col>
+            <b-col>
+                <b-form-input id="input-distip" v-model="srcIp" type="text" placeholder="Dist Ip"></b-form-input>
+            </b-col>
+            <b-col>
+                <b-form-input id="input-proto" v-model="protocol" type="text" placeholder="Proto"></b-form-input>
+            </b-col>
+            <b-col>
+                <b-button>Search</b-button>
+            </b-col>
+        </b-row>
+        <b-row class="mb-2">
+            <b-col>
+                <b-form-select v-model="selectedPPS" :options="ppsOptions">
+                </b-form-select>
+            </b-col>
+            <b-col>
+                <b-form-select v-model="selectedOrder" :options="orderOptions">
+                </b-form-select>
+            </b-col>
+            <b-col>
+                <b-form-input class='form-control'  v-model="timeOut" type="number"></b-form-input>
+            </b-col>
+            <b-col>
+                <b-button>Metric Filter</b-button>
+            </b-col>
+        </b-row>
+        <b-row align-v="stretch" class="mb-2">
+            <b-col>
+                <div class='result'>
+                    <div>
+                        <div class="setTimer">
+                            <span class="clock"></span>
+                            <select v-model="selectedTimeOut">
+                                <option 
+                                    v-for="(option,index) in timeOutOptions" 
+                                    :key="index"
+                                    :value="option.value">
+                                    {{option.text}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </div>
+            </b-col>
+        </b-row>
+    </b-container>
 </template>
 
 <script>
@@ -82,31 +64,31 @@ export default {
         return {
             selectedSearchType: searchType.FLOW,
             searchTypeOptions: [
-                {label: 'Device', value: searchType.DEVICE},
-                {label: 'Flow', value: searchType.FLOW},
-                {label: 'Link', value: searchType.LINK}  
+                {value: searchType.DEVICE, text: 'Device'},
+                {value: searchType.FLOW, text: 'Flow'},
+                {value: searchType.LINK, text: 'Link'}  
             ],
             searchRequirements: [
-                {label:"Src IP", value: this.srcIp},
-                {label: "Dist IP", value: this.distIp},
-                {label: "Proto", value: this.protocol},
+                {value:  this.srcIp, text: "Src IP"},
+                {value: this.distIp, text: "Dist IP"},
+                {value: this.protocol, text: 'Proto'}  
             ],
             selectedPPS: 'PPS',
             ppsOptions: [
-                {label: 'PPS', value: 'PPS'}
+                {value: 'PPS', text: 'PPS'}
             ],
             selectedOrder: 'ascending',
             orderOptions: [
-                {label: 'Ascending Order', value: 'ascending'}
+                {value: 'ascending', text: 'Ascending Order'}
             ],
             srcIp:'',
             distIp: '',
             protocol: '',
             timeOut: 1000,
             timeOutOptions: [
-                {label: 'Last 1 sec', value: 1},                
-                {label: 'Last 1 min', value: 60},                
-                {label: 'Last 10 mins', value: 6000},
+                {value: 1, text: 'Last 1 sec'},                
+                {value: 60, text: 'Last 1 min'},                
+                {value: 6000, text: 'Last 10 mins'},
             ],
             selectedTimeOut: 6000
         }
@@ -115,65 +97,10 @@ export default {
 </script>
 
 <style lang="scss">
-.container {
-    margin-right: 2em; 
-    align-content: stretch;
-    height: 100%;
-}
-.row {
-    display: flex;
-    flex-wrap: wrap;
-    
-    .col {
-        flex-basis: 0;
-        flex-grow: 1;
-        max-width: 100%;
-        padding-top: .75rem;
-        padding-bottom: .75rem;
-        display: flex;
-        justify-content: space-between;
-        .form-control {
-            display: block;
-            margin: 0 5px;
-            width: 100%;
-            padding: .375rem .75rem;
-            font-size: 1rem;
-            font-weight: 400;
-            line-height: 1;
-            color: #212529;
-            background-color: #fff;
-            background-clip: padding-box;
-            border: 1px solid #ced4da;
-            border-radius: .25rem;
-            transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-        }
-        button {
-            margin: 0 10px 5px 10px; 
-            width: 100%;
-            height: 100%;
-            display: inline-block;
-            color: white;
-            font-weight: 400;
-            text-align: center;
-            vertical-align: middle;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-            background-color: #495057;
-            border: 1px solid transparent;
-            padding: .375rem .75rem;
-            font-size: 1rem;
-            line-height: 1;
-            border-radius: .25rem;
-            transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-        }
-    }
-}
 .result {
     border: 1px solid lightgrey;
     width: 100%;
-    height: 80%;
+    min-height: 50rem;
     div {
         position: relative;
         display: flex;
