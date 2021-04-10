@@ -11,12 +11,102 @@ APIHelper.prototype.getNodeDef = function(data) {
     return result;
 };
 APIHelper.prototype.getDeviceMetricParam = function(deviceId) {
+    let param = getMetricParam();
+    param['query'] = {
+        'match': {
+            'dev_id': deviceId
+        }
+    }
+    return param;
+};
+APIHelper.prototype.getPortMetricParam = function(deviceId, portId) {
+    let param = getMetricParam();
+    param['query'] = {
+        'bool': {
+            'must': [
+                {
+                    'match': {
+                        'dev_id': deviceId
+                    }
+                },
+                {
+                    'match': {
+                        'port': portId
+                    }
+                }
+            ]
+        }
+    }
+    return param;
+};
+
+APIHelper.prototype.getMetric = function(data) {
+    let buckets = data['aggregations']['date_hist']['buckets'][0];
     return {
-        'query': {
-            'match': {
-                'dev_id': deviceId
+        'from': buckets['from_as_string'],
+        'to': buckets['to_as_string'],
+        'dropPacketCount': buckets['dropped_count_avg']['value'],
+        'dropBytes': buckets['dropped_bytes_avg']['value'],
+        'rxPacketCount': buckets['rx_count_avg']['value'],
+        'rxBytes': buckets['rx_bytes_avg']['value'],
+        'txPacketCount': buckets['tx_count_avg']['value'],
+        'txBytes': buckets['tx_bytes_avg']['value']
+    };
+};
+
+APIHelper.prototype.getDeviceNameList = function(data) {
+    let deviceList = this.getQueryResult(data);
+    let result = [];
+    for (let i in deviceList) {
+        result.push(deviceList[i]['id']);
+    }
+    return result;
+}
+
+APIHelper.prototype.getSearchAndDetailViewParam = function(deviceId, role) {
+    if(deviceId === undefined) {
+        return {};
+    }
+    let param = {
+        'query':{
+            'bool': {
+              'must': []
             }
-        },
+        }
+    };   
+    let must = {};
+    if(deviceId === undefined) {
+        must['wildcard'] = {'dev_name': deviceId}
+    }
+    if(role === undefined) {
+        must['match'] = {'dev_role': role}
+    }
+    if(Object.keys(must).length !== 0) {
+        param['query']["bool"]["must"].push(must);
+    }
+
+    return param;
+}
+
+APIHelper.prototype.getQueryResult = function(data) {
+    let result = [];
+    for (let i in data['hits']['hits']) {
+        let source = data['hits']['hits'][i]['_source'];
+        result.push({
+            'id': source['dev_id'],
+            'mac': source['dev_mac'],
+            'name': source['dev_name'],
+            'role': source['dev_role'],
+            'rx': source['rx_1m'],
+            'tx': source['tx_1m'],
+            'dropped': source['dropped_1m'],
+        });
+    }
+    return result;
+}
+
+function getMetricParam() {
+    return {
         'size': 0,
         'aggs': {
             'date_hist': {
@@ -58,37 +148,4 @@ APIHelper.prototype.getDeviceMetricParam = function(deviceId) {
             }
         }
     };
-};
-APIHelper.prototype.getDeviceMetric = function(data) {
-    let buckets = data['aggregations']['date_hist']['buckets'][0];
-    return {
-        'from': buckets['from_as_string'],
-        'to': buckets['to_as_string'],
-        'dropPacketCount': buckets['dropped_count_avg']['value'],
-        'dropBytes': buckets['dropped_bytes_avg']['value'],
-        'rxPacketCount': buckets['rx_count_avg']['value'],
-        'rxBytes': buckets['rx_bytes_avg']['value'],
-        'txPacketCount': buckets['tx_count_avg']['value'],
-        'txBytes': buckets['tx_bytes_avg']['value']
-    };
-};
-APIHelper.prototype.getPortMetricParam = function(deviceId, portId) {
-    return {
-        'query': {
-            'bool': {
-                'must': [
-                    {
-                        'match': {
-                            'dev_id': deviceId
-                        }
-                    },
-                    {
-                        'match': {
-                            'port': portId
-                        }
-                    }
-                ]
-            }
-        }
-    };
-};
+}

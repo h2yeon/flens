@@ -6,16 +6,23 @@
                 </b-form-select>
             </b-col>
             <b-col>
-                <b-form-input id="input-srcip" v-model="srcIp" type="text" placeholder="Src Ip"></b-form-input>
+                <b-input-group>
+                    <template #append>
+                        <b-button variant="outline-secondary" @click="isText = !isText">
+                            <b-icon icon="arrow-left-right"></b-icon>
+                        </b-button>
+                    </template>
+                    <b-form-input v-if="isText" v-model="name" type="text" placeholder="Name 입력"></b-form-input>
+                    <b-form-select v-else v-model="selectedName" :options="searchNames" aria-placeholder="Name" @input="inputName">
+                    </b-form-select>
+                </b-input-group>
             </b-col>
             <b-col>
-                <b-form-input id="input-distip" v-model="srcIp" type="text" placeholder="Dist Ip"></b-form-input>
+                <b-form-select v-model="selectedRole" :options="searchRoles" aria-placeholder="Role">
+                </b-form-select>
             </b-col>
             <b-col>
-                <b-form-input id="input-proto" v-model="protocol" type="text" placeholder="Proto"></b-form-input>
-            </b-col>
-            <b-col>
-                <b-button>Search</b-button>
+                <b-button style="width: 100%" @click="search">Search</b-button>
             </b-col>
         </b-row>
         <b-row class="mb-2">
@@ -31,7 +38,7 @@
                 <b-form-input class='form-control'  v-model="timeOut" type="number"></b-form-input>
             </b-col>
             <b-col>
-                <b-button>Metric Filter</b-button>
+                <b-button style="width: 100%" @click="filter">Metric Filter</b-button>
             </b-col>
         </b-row>
         <b-row align-v="stretch" class="mb-2">
@@ -57,22 +64,33 @@
 </template>
 
 <script>
-import {searchType} from '@/data/type/searchType'
+import {searchType} from '@/data/type/searchType.js'
+import {roleType} from '@/data/type/roleType.js'
+import axios from 'axios'
+import {APIHelper} from '@/APIHelper.js'
+window.apiHelper = new APIHelper();
 export default {
     name: "SearchDetail",
     data() {
         return {
-            selectedSearchType: searchType.FLOW,
+            isText: true,
+            selectedSearchType: searchType.DEVICE,
             searchTypeOptions: [
                 {value: searchType.DEVICE, text: 'Device'},
                 {value: searchType.FLOW, text: 'Flow'},
                 {value: searchType.LINK, text: 'Link'}  
             ],
-            searchRequirements: [
-                {value:  this.srcIp, text: "Src IP"},
-                {value: this.distIp, text: "Dist IP"},
-                {value: this.protocol, text: 'Proto'}  
+            searchNames: [
+                {value: null, text: 'Name 선택'},
             ],
+            selectedName: null,
+            searchRoles: [
+                {value: null, text: 'Role 선택'},
+                {value: roleType.SPINE, text: roleType.SPINE},
+                {value: roleType.LEAF, text: roleType.LEAF},
+                {value: roleType.CONTROLLER, text: roleType.CONTROLLER}
+            ],
+            selectedRole: null,
             selectedPPS: 'PPS',
             ppsOptions: [
                 {value: 'PPS', text: 'PPS'}
@@ -81,18 +99,27 @@ export default {
             orderOptions: [
                 {value: 'ascending', text: 'Ascending Order'}
             ],
-            srcIp:'',
-            distIp: '',
-            protocol: '',
-            timeOut: 1000,
+            timeOut: 100,
             timeOutOptions: [
-                {value: 1, text: 'Last 1 sec'},                
-                {value: 60, text: 'Last 1 min'},                
-                {value: 6000, text: 'Last 10 mins'},
+                {value: 6000, text: 'Last 1 mins'},                
+                {value: 30000, text: 'Last 5 mins'},                
+                {value: 60000, text: 'Last 10 mins'},
             ],
             selectedTimeOut: 6000
         }
+    },
+    methods: {
+        inputName(val) {
+            console.log(val);
+        },
+        search() {
+            
+        },
+        filter() {
+
+        }
     }
+    
 }
 </script>
 
@@ -109,7 +136,7 @@ export default {
             width: 220px;
             height: 35px;
             right: 10px;
-            top: 45rem;
+            top: 47rem;
             font-size: 1rem;
             font-weight: 400;
             line-height: 1;

@@ -1,6 +1,5 @@
-export const deviceType = {
+export const roleType = {
     SPINE: "SPINE",
     LEAF: "LEAF",
     CONTROLLER: "CONTROLLER"
-  }
-  
+}

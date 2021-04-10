@@ -63,7 +63,7 @@
 <script>
 import {define_html} from '@/joint/joint.shapes.device.js';
 import {define_link} from '@/joint/joint.shapes.link.js';
-import {deviceType} from '@/data/type/deviceType.js';
+import {roleType} from '@/data/type/roleType.js';
 import {APIHelper} from '@/APIHelper.js'
 import axios from 'axios';
 window.$ = require('jquery');
@@ -94,7 +94,7 @@ export default {
         return {
             graph: null,
             paper: null,
-            deviceType: deviceType,
+            roleType: roleType,
             spine: {x: 0, y: 120},
             leaf: {x: 0, y: 400},
             controller: {x: 0, y:680},
@@ -136,12 +136,12 @@ export default {
             this.paper.htmlContainer.appendChild(this.$refs.linkPopup);
             this.paper.htmlContainer.appendChild(this.$refs.portPopup);
             const vm = this;
-            let params = apiHelper.getNodeDef();
-            axios.get('/api/nodedef')
+            axios.get('/api/fabric_node_def.json')
                 .then(function(response) {
-                    vm.createCells(response.data);
+                    vm.createCells(apiHelper.getNodeDef(response.data));
                 })
                 .catch(function(error) {
+                    debugger;
                     console.log(error);
                 });
         },
@@ -168,7 +168,7 @@ export default {
                 graphCells.push(cell);
             })
             this.graph.addCells(graphCells);
-            axios.get('/api/link')
+            axios.get('/api/fabric_link.json')
                 .then(function(response) {
                     vm.setPortList(response.data, graphCells);
                 })
@@ -188,9 +188,9 @@ export default {
             this.createLinks(graphCells);
         },
         createLinks(result) {
-            var controllers = result.filter(cell => cell.attributes.fields.role === this.deviceType.CONTROLLER);
-            var leafs = result.filter(cell => cell.attributes.fields.role === this.deviceType.LEAF);
-            var spines = result.filter(cell => cell.attributes.fields.role === this.deviceType.SPINE);
+            var controllers = result.filter(cell => cell.attributes.fields.role === this.roleType.CONTROLLER);
+            var leafs = result.filter(cell => cell.attributes.fields.role === this.roleType.LEAF);
+            var spines = result.filter(cell => cell.attributes.fields.role === this.roleType.SPINE);
             const vm = this;
             controllers.forEach(c => {
                 leafs.forEach(l => {
@@ -296,22 +296,22 @@ export default {
             });
         },
         getPosition(result, role) {
-            let deviceType = this.deviceType;
+            let roleType = this.roleType;
             let length = result.filter(data => data.dev_role === role).length; 
             let width = Math.floor(this.width/(length+1)) - 20;
             let x, y;
             switch(role) {
-                case deviceType.SPINE:
+                case roleType.SPINE:
                     x = this.spine.x + width;
                     y = this.spine.y; 
                     this.spine.x = x;
                     break;
-                case deviceType.LEAF: 
+                case roleType.LEAF: 
                     x = this.leaf.x + width;
                     y = this.leaf.y; 
                     this.leaf.x = x;
                     break;
-                case deviceType.CONTROLLER: 
+                case roleType.CONTROLLER: 
                     x = this.controller.x + width;
                     y = this.controller.y; 
                     this.controller.x = x;
@@ -323,9 +323,9 @@ export default {
             let cell = this.graph.getCell(container.getAttribute('model-id'));
             const vm = this;
             if(!$(container).closest('.device-container').hasClass('popup')) {
-                axios.post('api/metric/', {params: apiHelper.getDeviceMetricParam(container.getAttribute('device-id'))})
+                axios.post('/metric/pps_counter_ndjson2/_search', {params: apiHelper.getDeviceMetricParam(container.getAttribute('device-id'))})
                     .then(function(response) {
-                        cell.attributes.metrics = response.data[0];
+                        cell.attributes.metrics = apiHelper.getDeviceMetric(response.data);
                         vm.paper.findViewByModel(cell).updateMetrics();
                         $(container).closest('.device-container').addClass('popup');
                         if($(container).position().top < 250) {
@@ -398,116 +398,4 @@ export default {
 
 <style lang="scss">
 @import '~@/assets/scss/topology';
-</style>
-<style scoped lang="scss">
-$search-icon: '../images/search.svg';
-$chart-icon:'../images/chart.svg';
-.link-popup {
-      position: absolute;
-      display: none;
-      box-sizing: border-box;
-      font-family: sans-serif;
-      box-shadow: 4px 4px 4px -1px rgba(0,0,0,0.18), -2px -2px 4px -1px rgba(0,0,0,0.18);
-      padding: 8px 16px;
-      background-color: #FCFCFC;
-      width: 300px;
-      height: 195px;
-      border-radius: 5px;
-      font-size: 18px;
-      &-field {
-          width: 100%;
-          -webkit-box-sizing: border-box;
-          box-sizing: border-box;
-          padding: 5px 0;
-          margin: 0;
-          background: #FFFFFF;
-          text-align: left;
-          letter-spacing: 0;
-          color: #222222;
-          border-radius: 0px;
-          justify-content: space-between;
-          display: flex;
-      }
-      &-header {
-          font-weight: bold;
-          border-top: 1px solid lightgrey;
-          border-bottom: 1px solid lightgrey;
-          width: 100%;
-          padding: 5px 0;
-          margin: 0;
-          text-align: left;
-      }
-    .link-tool-icon {
-        position: absolute;
-        left: 265px;
-        top: 165px;
-        display: flex;
-        justify-content: space-between;
-        &-search {
-            width: 25px; 
-            height: 25px;
-            background: url($search-icon) no-repeat top left;
-            background-size: contain;
-            cursor: pointer;
-        }
-    }
-}
-.port-popup {
-      position: absolute;
-      display: none;
-      box-sizing: border-box;
-      font-family: sans-serif;
-      box-shadow: 4px 4px 4px -1px rgba(0,0,0,0.18), -2px -2px 4px -1px rgba(0,0,0,0.18);
-      padding: 8px 16px;
-      background-color: #FCFCFC;
-      width: 300px;
-      height: 350px;
-      border-radius: 5px;
-      font-size: 18px;
-      &-field {
-          width: 100%;
-          -webkit-box-sizing: border-box;
-          box-sizing: border-box;
-          padding: 5px 0;
-          margin: 0;
-          background: #FFFFFF;
-          text-align: left;
-          letter-spacing: 0;
-          color: #222222;
-          border-radius: 0px;
-          justify-content: space-between;
-          display: flex;
-      }
-      &-header {
-          font-weight: bold;
-          border-top: 1px solid lightgrey;
-          border-bottom: 1px solid lightgrey;
-          width: 100%;
-          padding: 5px 0;
-          margin: 0;
-          text-align: left;
-      }
-    .port-tool-icon {
-        position: absolute;
-        left: 230px;
-        top: 315px;
-        display: flex;
-        justify-content: space-between;
-        &-chart {
-            width: 25px; 
-            height: 25px;
-            background: url($chart-icon) no-repeat top left;
-            background-size: contain;
-            margin-right: 10px;
-            cursor: pointer;
-        }
-        &-search {
-            width: 25px; 
-            height: 25px;
-            background: url($search-icon) no-repeat top left;
-            background-size: contain;
-            cursor: pointer;
-        }
-    }
-}
 </style>
