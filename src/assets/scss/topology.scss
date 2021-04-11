@@ -75,7 +75,7 @@ html, body {
         padding: 8px 16px;
         background-color: #FCFCFC;
         width: 350px;
-        height: 390px;
+        height: 425px;
         left: 55px;
         top: -330px;
         border-radius: 5px;
@@ -107,7 +107,7 @@ html, body {
     .device-tool-icon {
         position: absolute;
         left: 276px;
-        top: 360px;
+        top: 390px;
         display: flex;
         justify-content: space-between;
         &-chart {
@@ -126,112 +126,112 @@ html, body {
     }
 }
 
+.port-popup {
+    position: absolute;
+    display: none;
+    box-sizing: border-box;
+    font-family: sans-serif;
+    box-shadow: 4px 4px 4px -1px rgba(0,0,0,0.18), -2px -2px 4px -1px rgba(0,0,0,0.18);
+    padding: 8px 16px;
+    background-color: #FCFCFC;
+    width: 420px;
+    height: 490px;
+    border-radius: 5px;
+    font-size: 18px;
+    &-field {
+        width: 100%;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        padding: 5px 0;
+        margin: 0;
+        background: #FFFFFF;
+        text-align: left;
+        letter-spacing: 0;
+        color: #222222;
+        border-radius: 0px;
+        justify-content: space-between;
+        display: flex;
+    }
+    &-header {
+        font-weight: bold;
+        border-top: 1px solid lightgrey;
+        border-bottom: 1px solid lightgrey;
+        width: 100%;
+        padding: 5px 0;
+        margin: 0;
+        text-align: left;
+    }
+  .port-tool-icon {
+      position: absolute;
+      left: 350px;
+      top: 460px;
+      display: flex;
+      justify-content: space-between;
+      &-chart {
+          width: 25px; 
+          height: 25px;
+          background: url($chart-icon) no-repeat top left;
+          background-size: contain;
+          margin-right: 10px;
+          cursor: pointer;
+      }
+      &-search {
+          width: 25px; 
+          height: 25px;
+          background: url($search-icon) no-repeat top left;
+          background-size: contain;
+          cursor: pointer;
+      }
+  }
+  }
 
-// .link-popup {
-//   position: absolute;
-//   display: none;
-//   box-sizing: border-box;
-//   font-family: sans-serif;
-//   box-shadow: 4px 4px 4px -1px rgba(0,0,0,0.18), -2px -2px 4px -1px rgba(0,0,0,0.18);
-//   padding: 8px 16px;
-//   background-color: #FCFCFC;
-//   width: 300px;
-//   height: 195px;
-//   border-radius: 5px;
-//   font-size: 18px;
-//   &-field {
-//       width: 100%;
-//       -webkit-box-sizing: border-box;
-//       box-sizing: border-box;
-//       padding: 5px 0;
-//       margin: 0;
-//       background: #FFFFFF;
-//       text-align: left;
-//       letter-spacing: 0;
-//       color: #222222;
-//       border-radius: 0px;
-//       justify-content: space-between;
-//       display: flex;
-//   }
-//   &-header {
-//       font-weight: bold;
-//       border-top: 1px solid lightgrey;
-//       border-bottom: 1px solid lightgrey;
-//       width: 100%;
-//       padding: 5px 0;
-//       margin: 0;
-//       text-align: left;
-//   }
-// .link-tool-icon {
-//     position: absolute;
-//     left: 265px;
-//     top: 165px;
-//     display: flex;
-//     justify-content: space-between;
-//     &-search {
-//         width: 25px; 
-//         height: 25px;
-//         background: url($search-icon) no-repeat top left;
-//         background-size: contain;
-//         cursor: pointer;
-//     }
-// }
-// }
-// .port-popup {
-//   position: absolute;
-//   display: none;
-//   box-sizing: border-box;
-//   font-family: sans-serif;
-//   box-shadow: 4px 4px 4px -1px rgba(0,0,0,0.18), -2px -2px 4px -1px rgba(0,0,0,0.18);
-//   padding: 8px 16px;
-//   background-color: #FCFCFC;
-//   width: 300px;
-//   height: 350px;
-//   border-radius: 5px;
-//   font-size: 18px;
-//   &-field {
-//       width: 100%;
-//       -webkit-box-sizing: border-box;
-//       box-sizing: border-box;
-//       padding: 5px 0;
-//       margin: 0;
-//       background: #FFFFFF;
-//       text-align: left;
-//       letter-spacing: 0;
-//       color: #222222;
-//       border-radius: 0px;
-//       justify-content: space-between;
-//       display: flex;
-//   }
-//   &-header {
-//       font-weight: bold;
-//       border-top: 1px solid lightgrey;
-//       border-bottom: 1px solid lightgrey;
-//       width: 100%;
-//       padding: 5px 0;
-//       margin: 0;
-//       text-align: left;
-//   }
-// .port-tool-icon {
-//     position: absolute;
-//     left: 230px;
-//     top: 315px;
-//     display: flex;
-//     justify-content: space-between;
-//     &-chart {
-//         width: 25px; 
-//         height: 25px;
-//         background: url($chart-icon) no-repeat top left;
-//         background-size: contain;
-//         margin-right: 10px;
-//         cursor: pointer;
-//     }
-//     &-search {
-//         width: 25px; 
-//         height: 25px;
-//         background: url($search-icon) no-repeat top left;
-//         background-size: contain;
-//         cursor: pointer;
-//     }
-// }
-// }
+.link-popup {
+  position: absolute;
+  display: none;
+  box-sizing: border-box;
+  font-family: sans-serif;
+  box-shadow: 4px 4px 4px -1px rgba(0,0,0,0.18), -2px -2px 4px -1px rgba(0,0,0,0.18);
+  padding: 8px 16px;
+  background-color: #FCFCFC;
+  width: 300px;
+  height: 195px;
+  border-radius: 5px;
+  font-size: 18px;
+  &-field {
+      width: 100%;
+      -webkit-box-sizing: border-box;
+      box-sizing: border-box;
+      padding: 5px 0;
+      margin: 0;
+      background: #FFFFFF;
+      text-align: left;
+      letter-spacing: 0;
+      color: #222222;
+      border-radius: 0px;
+      justify-content: space-between;
+      display: flex;
+  }
+  &-header {
+      font-weight: bold;
+      border-top: 1px solid lightgrey;
+      border-bottom: 1px solid lightgrey;
+      width: 100%;
+      padding: 5px 0;
+      margin: 0;
+      text-align: left;
+  }
+.link-tool-icon {
+    position: absolute;
+    left: 265px;
+    top: 165px;
+    display: flex;
+    justify-content: space-between;
+    &-search {
+        width: 25px; 
+        height: 25px;
+        background: url($search-icon) no-repeat top left;
+        background-size: contain;
+        cursor: pointer;
+    }
+}
+}

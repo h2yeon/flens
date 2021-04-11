@@ -1,18 +1,18 @@
-export function define_link() {
+export function define_link(style) {
     joint.shapes.standard.Link.define('examples.CustomLink', {
         attrs: {
             line: {
                 connection: { stubs: 0 },
                 fill: 'none',
-                stroke: 'black',
-                strokeWidth: 2,
+                stroke: style.linkColor,
+                strokeWidth: style.linkWidth,
                 targetMarker: {
                     type: 'ellipse',
                 }
             },
             endReferenceBody: {
-                r: 5,
-                fill: 'black',
+                r: style.portSize,
+                fill: style.portColor,
                 cursor: 'pointer'
             },
             sourceReference: {

@@ -41,9 +41,18 @@ const devWebpackConfig = merge(baseWebpackConfig, {
     // proxy: config.dev.proxyTable,
     proxy: {
       "/api": {
+        target: "http://118.139.240.230:31036"
+      },
+      "/fabric_node_def.json": {
         target: "http://210.113.225.166:11000"
       },
-      "/metric": {
+      "/fabric_link.json": {
+        target: "http://210.113.225.166:11000"
+      },
+      "/pps_counter_ndjson2": {
+        target: "http://210.113.225.166:9200"
+      },
+      "/test_dev_idx4": {
         target: "http://210.113.225.166:9200"
       }
     },

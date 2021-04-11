@@ -58,7 +58,7 @@ APIHelper.prototype.getDeviceNameList = function(data) {
     let deviceList = this.getQueryResult(data);
     let result = [];
     for (let i in deviceList) {
-        result.push(deviceList[i]['id']);
+        result.push({value:deviceList[i]['id'], text:deviceList[i]['id']});
     }
     return result;
 }
@@ -75,14 +75,13 @@ APIHelper.prototype.getSearchAndDetailViewParam = function(deviceId, role) {
         }
     };   
     let must = {};
-    if(deviceId === undefined) {
-        must['wildcard'] = {'dev_name': deviceId}
+    if(deviceId !== undefined) {
+        var wildcard = {'wildcard': {'dev_name': deviceId}};
+        param['query']["bool"]["must"].push(wildcard);
     }
-    if(role === undefined) {
-        must['match'] = {'dev_role': role}
-    }
-    if(Object.keys(must).length !== 0) {
-        param['query']["bool"]["must"].push(must);
+    if(role !== undefined) {
+        var match = {'match': {'dev_role': role}};
+        param['query']["bool"]["must"].push(match);
     }
 
     return param;

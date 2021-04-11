@@ -339,8 +339,8 @@ export function define_html(vue) {
         },
         clickSearch: function(event) {
             event.stopPropagation();
-            // var modelId = $(this.closest('.device-container')).attr('model-id');
-            // vue.search(modelId);
+            var modelId = $(this.closest('.device-container')).attr('model-id');
+            vue.search(modelId);
         },
         clickChart: function(event) {
             event.stopPropagation();

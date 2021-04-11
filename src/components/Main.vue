@@ -2,10 +2,10 @@
     <b-container class="flens-container" fluid>
         <b-row align-v="stretch">
             <b-col cols="6" class="topology">
-                <topology/>
+                <topology :mainSearch="search"/>
             </b-col>
             <b-col class="searchDetail">
-                <search-detail/>
+                <search-detail ref="searchDetail"/>
             </b-col>
         </b-row>
     </b-container>
@@ -19,6 +19,11 @@ export default {
     components: {
         Topology,
         SearchDetail
+    },
+    methods: {
+        search() {
+            this.$refs.searchDetail.mainSearch();
+        }
     }
 }
 </script>
