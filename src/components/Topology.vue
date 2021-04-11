@@ -100,10 +100,10 @@ export default {
     mounted() {
         //link/port style
         var style = {
-            linkColor: 'black',
-            linkWidth: 2,
-            portColor: 'black',
-            portSize: 5
+            linkColor: 'black', //link 색상
+            linkWidth: 2,       //link stroke width
+            portColor: 'black', //port 색상
+            portSize: 5         //port 사이즈
         }
         this.width = this.$el.clientWidth;
         this.graph = new joint.dia.Graph;
