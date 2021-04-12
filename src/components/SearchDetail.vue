@@ -102,7 +102,7 @@ export default {
     name: "SearchDetail",
     mounted() {
         const vm = this;
-        axios.get('/test_dev_idx4/_search')
+        axios.get('/api/devicenamelist')
                 .then(function(response) {
                     vm.searchNames = apiHelper.getDeviceNameList(response.data);
                     vm.searchNames.unshift({value: null, text: 'Name 선택'});
@@ -170,10 +170,10 @@ export default {
             if(role === "" || role === undefined) {
                 role = undefined
             }
-            var params = apiHelper.getSearchAndDetailViewParam(deviceId, role);
-            axios.post('/test_dev_idx4/_search', params)
+            var params = {name: deviceId, role: role}
+            axios.post('/api/searchanddetail', params)
                 .then(function(response) {
-                    var result = apiHelper.getQueryResult(response.data);
+                    var result = response.data;
                     if(vm.isDetail) {
                         
                     } else {

@@ -161,9 +161,9 @@ export default {
         selectSourceTp() {
             if(this.sourceId === '' || (this.selectSourceTp === '' || this.selectSourceTp === undefined)) return;
             const vm = this;
-            axios.post('/pps_counter_ndjson2/_search', apiHelper.getPortMetricParam(this.sourceId, this.selectSourceTp))
+            axios.post('/api/metric', {device_id : this.sourceId, port_id : this.selectSourceTp})
                     .then(function(response) {
-                        vm.portMetric = apiHelper.getMetric(response.data);
+                        vm.portMetric = response.data;
                     })
                     .catch(function(error) {
                         console.log(error);
@@ -178,9 +178,9 @@ export default {
             this.paper.htmlContainer.appendChild(this.$refs.linkPopup);
             this.paper.htmlContainer.appendChild(this.$refs.portPopup);
             const vm = this;
-            axios.get('/fabric_node_def.json')
+            axios.get('/api/nodedef')
                 .then(function(response) {
-                    vm.createCells(apiHelper.getNodeDef(response.data));
+                    vm.createCells(response.data);
                 })
                 .catch(function(error) {
                     console.log(error);
@@ -209,7 +209,7 @@ export default {
                 graphCells.push(cell);
             })
             this.graph.addCells(graphCells);
-            axios.get('/fabric_link.json')
+            axios.get('/api/link')
                 .then(function(response) {
                     vm.setPortList(response.data, graphCells);
                 })
@@ -381,9 +381,9 @@ export default {
             let cell = this.graph.getCell(container.getAttribute('model-id'));
             const vm = this;
             if(!$(container).closest('.device-container').hasClass('popup')) {
-                axios.post('/pps_counter_ndjson2/_search', apiHelper.getDeviceMetricParam(container.getAttribute('device-id')))
+                axios.post('/api/metric', {device_id : container.getAttribute('device-id')})
                     .then(function(response) {
-                        cell.attributes.metrics = apiHelper.getMetric(response.data);
+                        cell.attributes.metrics = response.data;
                         vm.paper.findViewByModel(cell).updateMetrics();
                         $(container).closest('.device-container').addClass('popup');
                         if($(container).position().top < 250) {
