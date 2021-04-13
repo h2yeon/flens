@@ -104,7 +104,7 @@ export default {
         const vm = this;
         axios.get('/api/devicenamelist')
                 .then(function(response) {
-                    vm.searchNames = apiHelper.getDeviceNameList(response.data);
+                    vm.searchNames = response.data;
                     vm.searchNames.unshift({value: null, text: 'Name 선택'});
                 })
                 .catch(function(error) {
@@ -162,16 +162,16 @@ export default {
             this.isDetail = false;
             this.search(this.selectedName, this.selectedRole);
         },
-        search(deviceId, role) {
+        search(deviceName, role) {
             const vm = this;
-            if(deviceId === "null") {
-                deviceId = undefined;
+            if(deviceName === "null") {
+                deviceName = undefined;
             }
             if(role === "" || role === undefined) {
                 role = undefined
             }
-            var params = {name: deviceId, role: role}
-            axios.post('/api/searchanddetail', params)
+            var params = {name: deviceName, role: role}
+            axios.get('/api/searchanddetail?name=' + deviceName + '&role=' + role)
                 .then(function(response) {
                     var result = response.data;
                     if(vm.isDetail) {
@@ -190,7 +190,8 @@ export default {
         onRowClicked(row) {
             this.clickRow = row;
             this.isDetail = true;
-            this.search(row.id, row.role);
+            this.items = [];
+            this.search(row.name, row.role);
         },
         ...mapMutations({
             setSelectedSearchType: 'SET_SELECTED_SEARCH_TYPE',

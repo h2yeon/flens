@@ -4,6 +4,7 @@ export function define_html(vue) {
 
     Element.define('html.Element', {
         size: { width: 100, height: 100 },
+        position: {x: 0, y:0},
         fields: {
             name: '',
             role: '',

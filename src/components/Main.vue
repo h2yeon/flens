@@ -1,6 +1,6 @@
 <template>
     <b-container class="flens-container" fluid>
-        <b-row align-v="stretch">
+        <b-row>
             <b-col cols="6" class="topology">
                 <topology :mainSearch="search"/>
             </b-col>
@@ -31,5 +31,10 @@ export default {
 <style lang="scss">
 .flens-container {
     min-height: 60rem;
+    .topology {
+        min-height: 800px;
+        min-width: 600px;
+    }
 }
+
 </style>

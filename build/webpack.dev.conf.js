@@ -41,7 +41,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
     // proxy: config.dev.proxyTable,
     proxy: {
       "/api": {
-        target: "http://localhost:8000"
+        target: "http://118.139.240.230:11000"
       },
     },
     quiet: true, // necessary for FriendlyErrorsPlugin

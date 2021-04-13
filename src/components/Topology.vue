@@ -120,6 +120,10 @@ export default {
         define_link(style);
         this.topology_init();
         this.addEvent();
+        window.addEventListener('resize', this.handleResize);
+    },
+    beforeDestroy() {
+        window.removeEventListener('resize', this.handleResize);
     },
     data() {
         return {
@@ -161,7 +165,7 @@ export default {
         selectSourceTp() {
             if(this.sourceId === '' || (this.selectSourceTp === '' || this.selectSourceTp === undefined)) return;
             const vm = this;
-            axios.post('/api/metric', {device_id : this.sourceId, port_id : this.selectSourceTp})
+            axios.get('/api/metric?device_id=' +  this.sourceId + '&port_id=' + this.selectSourceTp)
                     .then(function(response) {
                         vm.portMetric = response.data;
                     })
@@ -192,7 +196,7 @@ export default {
             const data = result;
             data.forEach(o => {
                 var cell = new joint.shapes.html.Element({
-                    position: vm.getPosition(data, o.dev_role),
+                    position: vm.getPosition(data.filter(c => c.dev_role === o.dev_role).length, o.dev_role),
                     fields: {
                         name: o.dev_name,
                         role: o.dev_role,
@@ -353,9 +357,8 @@ export default {
                 }
             });
         },
-        getPosition(result, role) {
+        getPosition(length, role) {
             let roleType = this.roleType;
-            let length = result.filter(data => data.dev_role === role).length; 
             let width = Math.floor(this.width/(length+1)) - 20;
             let x, y;
             switch(role) {
@@ -377,11 +380,28 @@ export default {
             }
             return {x: x, y: y}
         },
+        handleResize() {
+            this.width = this.$el.clientWidth;
+            console.log(this.width);
+            let cells = this.graph.getCells().filter(c => c.get('type') === 'html.Element'); 
+            this.spine.x = 0;
+            this.leaf.x = 0;
+            this.controller.x = 0;
+            const vm = this;
+            cells.forEach(function(el) {
+                var role = el.attributes.fields.role;
+                var position = vm.getPosition(cells.filter(c => c.attributes.fields.role === role).length, role);
+                el.attributes.position = position;
+                el.set('position', position);
+                el.findView(vm.paper).updateHTML();
+            })
+            this.paper.updateViews();
+        },
         setMetricInfo(container) {
             let cell = this.graph.getCell(container.getAttribute('model-id'));
             const vm = this;
             if(!$(container).closest('.device-container').hasClass('popup')) {
-                axios.post('/api/metric', {device_id : container.getAttribute('device-id')})
+                axios.get('/api/metric?device_id=' + container.getAttribute('device-id'))
                     .then(function(response) {
                         cell.attributes.metrics = response.data;
                         vm.paper.findViewByModel(cell).updateMetrics();
@@ -404,15 +424,15 @@ export default {
         search: function(modelId) {
             let model = this.graph.getCell(modelId);
             this.setSelectedSearchType(this.searchType.DEVICE);
-            this.setSelectedName(model.device_id);
+            this.setSelectedName(model.attributes.fields.name);
             this.setSelectedRole(model.attributes.fields.role);
             this.mainSearch();
         },
         searchDetailPort: function(e) {
             // if(this.selectSourceTp === '' || this.selectSourceTp === undefined) return;
             this.setSelectedSearchType(this.searchType.DEVICE);
-            this.setSelectedName(this.sourceId);
             let cell = this.graph.getCells().filter(cell => cell.device_id === this.sourceId);
+            this.setSelectedName(cell[0].attributes.fields.name);
             this.setSelectedRole(cell[0].attributes.fields.role);
             this.mainSearch();
         },
