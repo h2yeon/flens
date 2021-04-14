@@ -395,7 +395,7 @@ export default {
                 el.set('position', position);
                 el.findView(vm.paper).updateHTML();
             })
-            this.paper.updateViews();
+            this.graph.resetCells(this.graph.getCells());
         },
         setMetricInfo(container) {
             let cell = this.graph.getCell(container.getAttribute('model-id'));
