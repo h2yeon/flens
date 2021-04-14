@@ -16,7 +16,7 @@
                 <div class="link-popup-value"></div>
             </div>
             <div class="link-tool-icon">
-                <div class="link-tool-icon-search"></div>
+                <div class="link-tool-icon-search" @click="searchDetailLink"></div>
             </div>
         </div>
         <div ref="portPopup" class="port-popup" 
@@ -298,7 +298,7 @@ export default {
                         vm.selectSourceTp = '';
                         vm.portPopupPosition.x = event.clientX;
                         vm.portPopupPosition.y = event.clientY;
-                        if(event.clientY > 650) {
+                        if(event.clientY > 500) {
                             vm.portPopupPosition.y = event.clientY - 490;
                         }
                         vm.source = elementView.model.getSourceElement();
@@ -422,21 +422,27 @@ export default {
             this.mainSearch();
         },
         searchDetailPort: function(e) {
-            // if(this.selectSourceTp === '' || this.selectSourceTp === undefined) return;
             this.setSelectedSearchType(this.searchType.DEVICE);
             let cell = this.graph.getCells().filter(cell => cell.device_id === this.sourceId);
             this.setSelectedName(cell[0].attributes.fields.name);
             this.setSelectedRole(cell[0].attributes.fields.role);
             this.mainSearch();
         },
+        searchDetailLink: function(e) {
+            this.setSelectedSearchType(this.searchType.LINK);
+            this.setSelectedName(null);
+            this.setSelectedRole(null);
+            this.mainSearch();
+        },
         openELKWindow: function(modelId, portId) {
             let model = this.graph.getCell(modelId);
-            let from = model.attributes.metrics.from;
-            let to = model.attributes.metrics.to;
-            let device_id = model.device_id;
-            console.log(portId);
-            let port = portId;
-            axios.get("api/dashboard/url?device_id=" + device_id + "&from=" +from + "&to="+to + "&port_id=" + port + "")
+            var params = {
+                device_id: model.device_id,
+                from: model.attributes.metrics.from,
+                to:model.attributes.metrics.to,
+                port_id:portId
+            }
+            axios.get("api/dashboard/url", {params: params})
                 .then(function(response) {
                     window.open(response.data, "_blank");
                 })

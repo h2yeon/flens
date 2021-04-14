@@ -40,7 +40,7 @@
                         style="max-height: 50rem"
                     >   
                        <template #cell(protocol)="row">
-                            <b-button size="sm" @click="openELKWindow()" variant="light">
+                            <b-button size="sm" @click="openProtocolWindow(row.item)" variant="light">
                                 {{row.item.protocol}} 
                             </b-button>
                         </template>
@@ -269,10 +269,29 @@ export default {
                 return;
             }
             model = model[0];
-            let from = model.attributes.metrics.from;
-            let to = model.attributes.metrics.to;
-            axios.get("api/dashboard/url?device_id=" + device_id + "&from=" +from + "&to="+to)
+            var params = {
+                device_id: device_id,
+                from: model.attributes.metrics.from,
+                to:model.attributes.metrics.to
+            }
+            axios.get("api/dashboard/url", {params: params})
                 .then(function(response) {
+                    window.open(response.data, "_blank");
+                })
+                .catch(function(error) {
+                    console.log(error);
+                });
+        },
+        openProtocolWindow(data) {
+            var params = {
+                src_ip:data.srcIp, 
+                src_port: data.srcPort,
+                dst_ip:data.dstIp,
+                dst_port: data.dstPort,
+                protocol: data.protocol}
+            axios.get("api/flowpath/dashboard/url", {params:params})
+                .then(function(response) {
+                    debugger;
                     window.open(response.data, "_blank");
                 })
                 .catch(function(error) {
