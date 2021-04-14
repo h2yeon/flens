@@ -12,9 +12,6 @@ html, body {
     overflow: hidden;
     width: 100% !important;
     height: 100% !important;
-    svg: {
-        border: 1px solid lightgray;
-    }
 }
 .popup {
     z-index: 9999 !important;
@@ -54,6 +51,10 @@ html, body {
     .device-img {
         width: 100%;
         height: 100%;
+    }
+    .device-name {
+        margin-top: -10px;
+        margin-left: 10px;
     }
     .spine {
         background: url($spine-img) no-repeat top left;

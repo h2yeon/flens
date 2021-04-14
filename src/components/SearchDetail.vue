@@ -2,89 +2,80 @@
     <b-container fluid class="mt-3">
         <b-row class="mb-2">
             <b-col>
-                <b-form-select :value="selectedSearchType" @change="setSelectedSearchType" :options="searchTypeOptions">
+                <b-form-select :value="selectedSearchType" @change="changeSearchType" :options="searchTypeOptions">
                 </b-form-select>
             </b-col>
             <b-col>
-                <b-input-group>
+                <b-input-group :style="{display: selectedSearchType===searchType.FLOW?'none':'flex'}" >
                     <template #append>
                         <b-button variant="outline-secondary" @click="isText = !isText;setSelectedName(null)">
                             <b-icon icon="arrow-left-right"></b-icon>
                         </b-button>
                     </template>
-                    <b-form-input v-if="isText" :value="selectedName" @input="setSelectedName" type="text" placeholder="Name 입력"></b-form-input>
+                    <b-form-input v-if="isText" :value="selectedName" 
+                    @input="setSelectedName" type="text" placeholder="Name 입력"></b-form-input>
                     <b-form-select v-else :value="selectedName" @change="setSelectedName" :options="searchNames" aria-placeholder="Name">
                     </b-form-select>
                 </b-input-group>
             </b-col>
             <b-col>
-                <b-form-select :value="selectedRole" @change="setSelectedRole" :options="searchRoles" aria-placeholder="Role">
+                <b-form-select :style="{display: selectedSearchType===searchType.FLOW?'none':'inline-block'}"
+                 :value="selectedRole" @change="setSelectedRole" :options="searchRoles" aria-placeholder="Role">
                 </b-form-select>
             </b-col>
             <b-col>
-                <b-button style="width: 100%" @click="isDetail=false;
+                <b-button style="width: 100%" @click="
                 search(selectedName? isText?selectedName + '*' : selectedName : undefined,selectedRole?selectedRole:undefined)">Search</b-button>
-            </b-col>
-        </b-row>
-        <b-row class="mb-2">
-            <b-col>
-                <b-form-select v-model="selectedPPS" :options="ppsOptions">
-                </b-form-select>
-            </b-col>
-            <b-col>
-                <b-form-select v-model="selectedOrder" :options="orderOptions">
-                </b-form-select>
-            </b-col>
-            <b-col>
-                <b-form-input class='form-control'  v-model="timeOut" type="number"></b-form-input>
-            </b-col>
-            <b-col>
-                <b-button style="width: 100%" @click="filter">Metric Filter</b-button>
             </b-col>
         </b-row>
         <b-row align-v="stretch" class="mb-2">
             <b-col>
                 <div class='result'>
-                    <b-container v-if="isDetail" class="mt-3" >
-                        <b-card>
-                            <b-card-title>Device Info</b-card-title>
-                            <b-card-text>ID : {{clickRow.id}}</b-card-text>
-                            <b-card-text>Name : {{clickRow.name}}</b-card-text>
-                            <b-card-text>Mac : {{clickRow.mac}}</b-card-text>
-                            <b-card-text>Role : {{clickRow.role}}</b-card-text>
-                            <b-card-text>Rx : {{clickRow.rx}}</b-card-text>
-                            <b-card-text>Tx : {{clickRow.tx}}</b-card-text>
-                            <b-card-text>Dropped : {{clickRow.dropped}}</b-card-text>
-                        </b-card>
-                        <b-card class="mt-2">
-                            <b-card-title>Metric<div class="chartIcon"></div></b-card-title>
-
-                        </b-card>
-                        <b-card class="mt-2">
-                            <b-card-title>Active Port</b-card-title>
-                            
-                        </b-card>
-                    </b-container>
                     <b-table 
-                    v-else
-                    hover 
-                    :fields="fields" 
-                    :items="items"
-                    @row-dblclicked="onRowClicked"
-                    selectable
-                    ></b-table>
-                    
-                    <div class="setTimer">
-                        <b-icon icon="clock" class="ml-3"></b-icon>
-                        <select v-model="selectedTimeOut">
-                            <option 
-                                v-for="(option,index) in timeOutOptions" 
-                                :key="index"
-                                :value="option.value">
-                                {{option.text}}
-                            </option>
-                        </select>
-                    </div>
+                        hover 
+                        :fields="selectedSearchType === searchType.FLOW? flowFields : deviceFields" 
+                        :items="items"
+                        selectable
+                        sticky-header
+                        style="max-height: 50rem"
+                    >
+                       <template #cell(detail)="row">
+                            <b-button size="sm" @click="row.toggleDetails">
+                                {{ row.detailsShowing ? 'Hide' : 'Show' }} Details
+                            </b-button>
+                        </template>
+                         <template #row-details="row">
+                            <b-card no-body class="mx-3"
+                                    v-if="selectedSearchType === searchType.FLOW">
+                                <b-table  
+                                    :fields="detailFlowFields"
+                                    :items="row.item.flowPathList"
+                                    @row-clicked="onDetailRowClicked"
+                                >
+                                </b-table>
+                            </b-card>
+                            <b-container fluid v-else> 
+                                <b-card >
+                                    <b-card-title>Device Info</b-card-title>
+                                    <b-card-text>ID : {{row.item.id}}</b-card-text>
+                                    <b-card-text>Name : {{row.item.name}}</b-card-text>
+                                    <b-card-text>Mac : {{row.item.mac}}</b-card-text>
+                                    <b-card-text>Role : {{row.item.role}}</b-card-text>
+                                    <b-card-text>Rx : {{row.item.rx}}</b-card-text>
+                                    <b-card-text>Tx : {{row.item.tx}}</b-card-text>
+                                    <b-card-text>Dropped : {{row.item.dropped}}</b-card-text>
+                                </b-card>
+                                <b-card class="mt-2">
+                                    <b-card-title>Metric<div class="chartIcon" @click="openELKWindow(row.item.id)"></div></b-card-title>
+
+                                </b-card>
+                                <b-card class="mt-2">
+                                    <b-card-title>Active Port</b-card-title>
+                                    
+                                </b-card>
+                            </b-container>
+                        </template>
+                    </b-table>
                 </div>
             </b-col>
         </b-row>
@@ -104,7 +95,9 @@ export default {
         const vm = this;
         axios.get('/api/devicenamelist')
                 .then(function(response) {
-                    vm.searchNames = response.data;
+                    vm.searchNames = response.data.map(r => ({
+                        value: r.id,text: r.name
+                    }));
                     vm.searchNames.unshift({value: null, text: 'Name 선택'});
                 })
                 .catch(function(error) {
@@ -113,6 +106,8 @@ export default {
     },
     computed: {
         ...mapState({
+            graph: state => state.graph,
+            paper: state => state.paper,
             selectedSearchType: state => state.selectedSearchType,
             selectedName: state => state.selectedName,
             selectedRole: state => state.selectedRole,
@@ -121,6 +116,7 @@ export default {
     data() {
         return {
             isText: true,
+            searchType: searchType,
             searchTypeOptions: [
                 {value: searchType.DEVICE, text: 'Device'},
                 {value: searchType.FLOW, text: 'Flow'},
@@ -135,31 +131,42 @@ export default {
                 {value: roleType.LEAF, text: roleType.LEAF},
                 {value: roleType.CONTROLLER, text: roleType.CONTROLLER}
             ],
-            selectedPPS: 'PPS',
-            ppsOptions: [
-                {value: 'PPS', text: 'PPS'}
-            ],
-            selectedOrder: 'ascending',
-            orderOptions: [
-                {value: 'ascending', text: 'Ascending Order'}
-            ],
-            timeOut: 100,
             timeOutOptions: [
                 {value: 6000, text: 'Last 1 mins'},                
                 {value: 30000, text: 'Last 5 mins'},                
                 {value: 60000, text: 'Last 10 mins'},
             ],
             selectedTimeOut: 6000,
-            fields: ['id', 'name', 'role', 'rx', 'tx', 'dropped'],
+            deviceFields: [
+                {key:'id', label: 'ID'}, 
+                {key:'name', label: 'Name'}, 
+                {key:'role', label: 'Role'}, 
+                {key:'rx', label: 'Rx'}, 
+                {key:'tx', label: 'Tx'},
+                {key:'dropped', label: 'Dropped'},
+                {key:'detail', label: 'Detail'}
+            ],
+            flowFields: [
+                {key:'srcIp', label:'Source IP'}, 
+                {key:'srcPort', label: 'Source Port'}, 
+                {key:'dstIp', label: 'Destination IP'}, 
+                {key:'dstPort', label: 'Destination Port'},
+                {key:'protocol', label: 'Protocol'},
+                {key:'detail', label: 'Detail'}
+            ],
             items: [
             ],
-            isDetail: false,
+            detailFlowFields: [
+                {key: 'srcDeviceId', label: 'Source Device ID'},
+                {key: 'srcPortId', label: 'Source Port ID'},
+                {key: 'dstDeviceId', label: 'Destination Device ID'},
+                {key: 'dstPortId', label: 'Destination Port ID'}
+            ],
             clickRow: null
         }
     },
     methods: {
         mainSearch() {
-            this.isDetail = false;
             this.search(this.selectedName, this.selectedRole);
         },
         search(deviceName, role) {
@@ -171,27 +178,101 @@ export default {
                 role = undefined
             }
             var params = {name: deviceName, role: role}
-            axios.get('/api/searchanddetail?name=' + deviceName + '&role=' + role)
+            let url = '/api/searchanddetail?name=' + deviceName + '&role=' + role; 
+            if(this.selectedSearchType === this.searchType.FLOW) {
+                url = '/api/flowpath';
+            }
+            axios.get(url)
                 .then(function(response) {
                     var result = response.data;
-                    if(vm.isDetail) {
-                        
-                    } else {
                         vm.items = result;
-                    }
                 })
                 .catch(function(error) {
                     console.log(error);
                 });
         },
-        filter() {
+        onDetailRowClicked(data) {
+            this.graph.removeCells(this.graph.getLinks().filter(l => l.get('type') === 'standard.Link'));
+            this.graph.getLinks().forEach(l => {
+                l.attr({
+                    line: {
+                        stroke: 'black'
+                    }
+                })
+            })
+            let source = this.graph.getCells().filter(cell => cell.device_id === data.srcDeviceId);
+            let target = this.graph.getCells().filter(cell => cell.device_id === data.dstDeviceId);
+            let links = this.graph.getLinks();
+            if(source.length === 0 || target.length === 0) {
+                let randomIndex = Math.floor(Math.random()*10);
+                if(randomIndex >= links.length) randomIndex = links.length-1;
+                links[randomIndex].attr({
+                    line: { 
+                        stroke: 'red' 
+                    }
+                })
+                return;
+            }
+            if(data.srcDeviceId === data.dstDeviceId) {
+                let position = source[0].position();
+                let size = source[0].size();
+                let start = {x: position.x + Math.floor(size.width/2), y : position.y+10};
+                let end = {x: position.x + size.width - 20, y: position.y + Math.floor(size.height/2)};
+                var link = new joint.shapes.standard.Link();
+                link.source(start);
+                link.target(end);
+                link.connector('smooth');
+                link.vertices([
+                    { x: start.x + 30, y: start.y - 30 },
+                    { x: end.x + 30, y: end.y - 30 }]);
+                link.attr({
+                    line: {
+                        stroke: 'red',
+                        strokeWidth: 2,
+                    }
+                })
+                link.addTo(this.graph);
+            } else {
+                let link = links.filter(l => l.source() === srcDeviceId && l.target() === dstDeviceId);
+                var existLink = false;
+                if(link.length === 0) {
+                    link = links.filter(l => l.target === srcDeviceId && l.source === dstDeviceId);
+                    if(link.length > 0) {
+                        existLink = true;
+                    }
+                } else {
+                    existLink = true;
+                }
+
+                if(existLink) {
+                    link[0].attr({
+                        line: {
+                            stroke: 'red'
+                        }
+                    })
+                }
+            }
 
         },
-        onRowClicked(row) {
-            this.clickRow = row;
-            this.isDetail = true;
+        changeSearchType(val) {
             this.items = [];
-            this.search(row.name, row.role);
+            this.setSelectedSearchType(val);
+        },
+        openELKWindow: function(device_id) {
+            let model = this.graph.getCells().filter(cell => cell.device_id === device_id);
+            if(model.length === 0) {
+                return;
+            }
+            model = model[0];
+            let from = model.attributes.metrics.from;
+            let to = model.attributes.metrics.to;
+            axios.get("api/dashboard/url?device_id='" + device_id + "'&from=" +from + "&to="+to)
+                .then(function(response) {
+                    window.open(response.data, "_blank");
+                })
+                .catch(function(error) {
+                    console.log(error);
+                });
         },
         ...mapMutations({
             setSelectedSearchType: 'SET_SELECTED_SEARCH_TYPE',
@@ -216,38 +297,6 @@ export default {
     border: 1px solid lightgrey;
     width: 100%;
     min-height: 50rem;
-    
-    .setTimer {
-        position: absolute;
-        width: 180px;
-        height: 35px;
-        right: 30px;
-        top: 47rem;
-        font-size: 1rem;
-        font-weight: 400;
-        line-height: 1;
-        color: black;
-        background-color: #fff;
-        background-clip: padding-box;
-        transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-        border: 1px solid #ced4da;
-        border-radius: .25rem;
-        .clock {
-            background: url('../images/clock.png') no-repeat top left;
-            background-size: contain;
-            width: 25px;
-            height: 25px;
-            margin-top: 5px;
-            margin-right: 5px;
-        }
-        select {
-            min-width: 120px;
-            padding: .375rem .75rem;
-            border: none;
-            &:focus {
-                outline: 0;
-            }
-        }
-    }
+    max-height: 50rem;
 }
 </style>

@@ -1,8 +1,6 @@
 <template>
     <div id="topology">
         <div ref="linkPopup" class="link-popup" 
-            @mouseover="showLinkPopup" 
-            @mouseleave="hideLinkPopup" 
             :style="{top:linkPopupPosition.y + 'px', left:linkPopupPosition.x + 'px'}">
             <div class="link-popup-field">
                 <div class="link-popup-label">Name</div>
@@ -22,8 +20,6 @@
             </div>
         </div>
         <div ref="portPopup" class="port-popup" 
-            @mouseover="showPortPopup" 
-            @mouseleave="hidePortPopup"
             :style="{top:portPopupPosition.y + 'px', left:portPopupPosition.x + 'px'}">
             <div class="port-popup-field">
                 <div class="port-popup-label">Name</div>
@@ -70,7 +66,7 @@
                 <div class="port-popup-value">{{portMetric.txPacketCount}}</div>
             </div>
             <div class="port-tool-icon">
-                <div class="port-tool-icon-chart" @click="openELKWindow(source.id, selectSourceTp)"></div>
+                <div class="port-tool-icon-chart" @click="openELKWindow(sourceId, selectSourceTp)"></div>
                 <div class="port-tool-icon-search" @click="searchDetailPort"></div>
             </div>
         </div>
@@ -83,7 +79,7 @@ import {define_link} from '@/joint/joint.shapes.link.js';
 import {searchType} from '@/data/type/searchType.js';
 import {roleType} from '@/data/type/roleType.js';
 import {APIHelper} from '@/APIHelper.js'
-import {mapMutations} from 'vuex'
+import {mapState, mapMutations} from 'vuex'
 import axios from 'axios';
 window.$ = require('jquery');
 window.joint = require('jointjs');
@@ -106,8 +102,8 @@ export default {
             portSize: 5         //port 사이즈
         }
         this.width = this.$el.clientWidth;
-        this.graph = new joint.dia.Graph;
-        this.paper = new joint.dia.Paper({
+        this.setGraph(new joint.dia.Graph);
+        this.setPaper(new joint.dia.Paper({
             el: $('#topology'),
             model: this.graph,
             width: this.width,
@@ -115,7 +111,7 @@ export default {
             marginX: 100,
             marginY: 100,
             gridSize: 1
-        });
+        }));
         define_html(this);
         define_link(style);
         this.topology_init();
@@ -125,10 +121,14 @@ export default {
     beforeDestroy() {
         window.removeEventListener('resize', this.handleResize);
     },
+    computed: {
+        ...mapState({
+            graph: state => state.graph,
+            paper: state => state.paper,
+        })
+    },
     data() {
         return {
-            graph: null,
-            paper: null,
             roleType: roleType,
             searchType: searchType,
             spine: {x: 0, y: 120},
@@ -277,82 +277,69 @@ export default {
         }, 
         addEvent() {
             const vm = this;
-            this.paper.on('blank:pointerdown cell:pointerdown', function(elementView, event) {
-                document.activeElement.blur();
-                var devicePopup = $(elementView.html).find('.device-popup');
-                if(devicePopup.css('display') !== 'none') {
-                    devicePopup.css('display', 'none'); 
-                }
-            });
-            this.paper.on('blank:pointerup cell:pointerup', function(elementView, event) {
-                document.activeElement.blur();
-                var devicePopup = $(elementView.html).find('.device-popup');
-                if(devicePopup.css('display') === 'none') {
-                    devicePopup.css('display', 'block'); 
-                }
-            });
-            this.paper.on('link:mouseenter', function(elementView, event) {
+            this.paper.on('link:contextmenu', function(elementView, event) {
                 if(event.target.tagName === 'circle') {
-                    vm.portMetric =  {
-                        from: "",
-                        to: "",
-                        dropBytes: null,
-                        dropPacketCount: null,
-                        rxBytes: null,
-                        rxPacketCount: null,
-                        txBytes: null,
-                        txPacketCount: null,
-                    };
-                    vm.selectSourceTp = '';
-                    vm.portPopupPosition.x = event.clientX;
-                    vm.portPopupPosition.y = event.clientY;
-                    if(event.clientY > 650) {
-                        vm.portPopupPosition.y = event.clientY - 490;
-                    }
                     let portPopup = $(vm.$refs.portPopup).closest('.port-popup');
-                    vm.source = elementView.model.getSourceElement();
-                    vm.target = elementView.model.getTargetElement();
-                    if(event.target.getAttribute('joint-selector') === 'target') {
-                        vm.source = elementView.model.getTargetElement();
-                        vm.target = elementView.model.getSourceElement();
+                    if(portPopup.hasClass('popup')) {
+                        portPopup.removeClass(['popup', 'appear'])
+                        portPopup.addClass('disappear');
+                        portPopup.css('display', 'none');
+                    } else {
+                        vm.portMetric =  {
+                            from: "",
+                            to: "",
+                            dropBytes: null,
+                            dropPacketCount: null,
+                            rxBytes: null,
+                            rxPacketCount: null,
+                            txBytes: null,
+                            txPacketCount: null,
+                        };
+                        vm.selectSourceTp = '';
+                        vm.portPopupPosition.x = event.clientX;
+                        vm.portPopupPosition.y = event.clientY;
+                        if(event.clientY > 650) {
+                            vm.portPopupPosition.y = event.clientY - 490;
+                        }
+                        vm.source = elementView.model.getSourceElement();
+                        vm.target = elementView.model.getTargetElement();
+                        if(event.target.getAttribute('joint-selector') === 'target') {
+                            vm.source = elementView.model.getTargetElement();
+                            vm.target = elementView.model.getSourceElement();
+                        }
+                        let source = vm.source;
+                        vm.sourceId = source.device_id;
+                        vm.sourceTp = 
+                        source.attributes.tp_list
+                            .filter(tp => tp.dev_id === source.device_id && tp.tar.length > 0)
+                            .filter(tp => tp.tar[0].tar_dev_id === vm.target.device_id)
+                            .map(tp => ({
+                                value: tp.tp,
+                                text: tp.tp
+                            }));
+                        portPopup.addClass(['popup', 'appear'])
+                        portPopup.removeClass('disappear');
+                        portPopup.css({
+                            display: 'block'
+                        });
                     }
-                    let source = vm.source;
-                    vm.sourceId = source.device_id;
-                    vm.sourceTp = source.attributes.tp_list.filter(tp => tp.dev_id === source.device_id && tp.tar[0] !== undefined).map(tp => ({
-                        value: tp.tp,
-                        text: tp.tp
-                    }));
-                    vm.targetId = vm.target.device_id;
-                    portPopup.addClass(['popup', 'appear'])
-                    portPopup.removeClass('disappear');
-                    portPopup.css({
-                        display: 'block'
-                    });
                 } else {
                     vm.linkPopupPosition.x = event.clientX;
                     vm.linkPopupPosition.y = event.clientY;
                     let linkPopup = $(vm.$refs.linkPopup).closest('.link-popup');
-                    linkPopup.addClass(['popup', 'appear'])
-                    linkPopup.removeClass('disappear');
-                    linkPopup.css({
-                        display: 'block'
-                    });
-                }
-            });
-            this.paper.on('link:mouseleave', function(elementView, event) {
-                if(event.target.tagName === 'circle') {
-                    let portPopup = $(vm.$refs.portPopup).closest('.port-popup');
-                    if(!portPopup.hasClass('port')) {
-                        portPopup.removeClass(['popup', 'appear'])
-                        portPopup.addClass('disappear');
-                        portPopup.css('display', 'none');
-                    }
-                } else {
-                    let linkPopup = $(vm.$refs.linkPopup).closest('.link-popup');
-                    if(!linkPopup.hasClass('link')) {
-                        linkPopup.removeClass(['popup', 'appear'])
-                        linkPopup.addClass('disappear');
-                        linkPopup.css('display', 'none');
+                    if(linkPopup.hasClass('popup')) {
+                        let linkPopup = $(vm.$refs.linkPopup).closest('.link-popup');
+                        if(!linkPopup.hasClass('link')) {
+                            linkPopup.removeClass(['popup', 'appear'])
+                            linkPopup.addClass('disappear');
+                            linkPopup.css('display', 'none');
+                        }
+                    } else {
+                        linkPopup.addClass(['popup', 'appear'])
+                        linkPopup.removeClass('disappear');
+                        linkPopup.css({
+                            display: 'block'
+                        });
                     }
                 }
             });
@@ -382,7 +369,6 @@ export default {
         },
         handleResize() {
             this.width = this.$el.clientWidth;
-            console.log(this.width);
             let cells = this.graph.getCells().filter(c => c.get('type') === 'html.Element'); 
             this.spine.x = 0;
             this.leaf.x = 0;
@@ -396,17 +382,24 @@ export default {
                 el.findView(vm.paper).updateHTML();
             })
             this.graph.resetCells(this.graph.getCells());
+            this.graph.removeCells(this.graph.getLinks().filter(l => l.get('type') === 'standard.Link'));
         },
         setMetricInfo(container) {
             let cell = this.graph.getCell(container.getAttribute('model-id'));
             const vm = this;
-            if(!$(container).closest('.device-container').hasClass('popup')) {
+            if($(container).closest('.device-container').hasClass('popup')) {
+                $(container).closest('.device-container').removeClass('popup');
+                var popup = container.lastChild;
+                popup.style.display = 'none';
+                popup.classList.add('disappear');
+                popup.classList.remove('appear');
+            } else {
                 axios.get('/api/metric?device_id=' + container.getAttribute('device-id'))
                     .then(function(response) {
                         cell.attributes.metrics = response.data;
                         vm.paper.findViewByModel(cell).updateMetrics();
                         $(container).closest('.device-container').addClass('popup');
-                        if($(container).position().top < 250) {
+                        if($(container).position().top < 300) {
                             $(container).find('.device-popup').css({top: Math.floor($(container).height()/2)});
                         } else {
                             $(container).find('.device-popup').css({top: '-375px'});
@@ -441,49 +434,18 @@ export default {
             let from = model.attributes.metrics.from;
             let to = model.attributes.metrics.to;
             let device_id = model.device_id;
-            let port = portId === undefined ? '' : portId;
-            let url = "http://210.113.225.166:25601/app/dashboards#/view/5a65d140-8ae8-11eb-b70e-2f1a3dbeec6a?"
-                    + "_g=(filters:!(),query:(language:kuery,query:''),refreshInterval:(pause:!t,value:0),time:(from:'"
-                    + from + "',to:'" + to + "'))&_a=(description:'',filters:!(('$state':(store:appState),meta:(alias:!n,"
-                    + "disabled:!f,index:'8b595fa0-8ac6-11eb-8007-071c2d9bfa1e',key:dev_id,negate:!f,params:(query:"
-                    + device_id + "),type:phrase),query:(match_phrase:(dev_id:" + device_id + "))),('$state':(store:appState),meta:(alias:!n,"
-                    + "disabled:!f,index:'8b595fa0-8ac6-11eb-8007-071c2d9bfa1e',key:port,negate:!f,params:(query:" 
-                    + port + "),type:phrase),query:(match_phrase:(port:" + port + ")))),fullScreenMode:!f,options:(hidePanelTitles:!f,useMargins:!t)," 
-                    + "query:(language:kuery,query:''),timeRestore:!f,title:Non_INT_Metric_Dashboard,viewMode:view)";
-            window.open(url, "_blank");
-        },
-        showLinkPopup: function(e) {
-            let linkPopup = $(e.target).closest('.link-popup');
-            linkPopup.addClass(['popup', 'appear', 'link'])
-            linkPopup.removeClass('disappear');
-            linkPopup.css({
-                display: 'block'
-            });
-        },
-        hideLinkPopup: function(e) {
-            let linkPopup = $(e.target).closest('.link-popup');
-            linkPopup.removeClass(['popup', 'appear', 'link'])
-            linkPopup.addClass('disappear');
-            linkPopup.css('display', 'none');
-        },
-        showPortPopup: function(e) {
-            let portPopup = $(e.target).closest('.port-popup');
-            portPopup.addClass(['popup', 'appear', 'port'])
-            portPopup.removeClass('disappear');
-            portPopup.css({
-                display: 'block'
-            });
-        },
-        hidePortPopup: function(e) {
-            let portPopup = $(e.target).closest('.port-popup');
-            portPopup.removeClass(['popup', 'appear', 'port'])
-            portPopup.addClass('disappear');
-            portPopup.css('display', 'none');
-            this.source = null;
-            this.sourceId = '';
-            this.sourceTp = [];
+            let port = portId;
+            axios.get("api/dashboard/url?device_id='" + device_id + "'&from=" +from + "&to="+to + "&port_id='" + port + "'")
+                .then(function(response) {
+                    window.open(response.data, "_blank");
+                })
+                .catch(function(error) {
+                    console.log(error);
+                });
         },
         ...mapMutations({
+            setGraph: 'SET_GRAPH',
+            setPaper: 'SET_PAPER',
             setSelectedSearchType: 'SET_SELECTED_SEARCH_TYPE',
             setSelectedName: 'SET_SELECTED_NAME',
             setSelectedRole: 'SET_SELECTED_ROLE'

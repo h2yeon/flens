@@ -4,7 +4,6 @@ export function define_html(vue) {
 
     Element.define('html.Element', {
         size: { width: 100, height: 100 },
-        position: {x: 0, y:0},
         fields: {
             name: '',
             role: '',
@@ -42,6 +41,13 @@ export function define_html(vue) {
                 groupSelector: 'field',
                 attributes: {
                     'data-attribute': 'role'
+                }
+            },{
+                tagName: 'div',
+                className: 'device-name',
+                groupSelector: 'field',
+                attributes: {
+                    'data-attribute':'name'
                 }
             },{
                 tagName: 'div',
@@ -267,8 +273,8 @@ export function define_html(vue) {
             var searchIcon = doc.selectors.searchIcon;
             var chartIcon = doc.selectors.chartIcon;
             this.paper.htmlContainer.appendChild(doc.fragment);
-            html.addEventListener('mouseover', this.showPopup);
-            html.addEventListener('mouseleave', this.hidePopup);
+            html.addEventListener('contextmenu', this.showPopup);
+            // html.addEventListener('mouseleave', this.hidePopup);
             searchIcon.addEventListener('mousedown', this.clickSearch);  
             chartIcon.addEventListener('mousedown', this.clickChart);  
             this.html = html;
@@ -291,9 +297,9 @@ export function define_html(vue) {
             var bbox = this.model.getBBox();
             var html = this.html;
             html.style.width = bbox.width + 'px';
-            html.style.height = bbox.height + 'px';
+            html.style.height = bbox.height - 10 + 'px';
             html.style.left = bbox.x + 'px';
-            html.style.top = bbox.y + 'px';
+            html.style.top = bbox.y - 5 + 'px';
         },
 
         updateFields: function() {
@@ -305,6 +311,9 @@ export function define_html(vue) {
                         field.classList.add(value.toLowerCase());
                         return;
                     case 'DEVICE-POPUP-VALUE' : 
+                        field.textContent = value;
+                        return;
+                    case 'DEVICE-NAME' : 
                         field.textContent = value;
                         return;
                 }
@@ -332,11 +341,6 @@ export function define_html(vue) {
             vue.setMetricInfo(this);
         },
         hidePopup: function() {
-            $(this).closest('.device-container').removeClass('popup');
-            var popup = this.lastChild;
-            popup.style.display = 'none';
-            popup.classList.add('disappear');
-            popup.classList.remove('appear');
         },
         clickSearch: function(event) {
             event.stopPropagation();

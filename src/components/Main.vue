@@ -1,11 +1,16 @@
 <template>
     <b-container class="flens-container" fluid>
-        <b-row>
-            <b-col cols="6" class="topology">
-                <topology :mainSearch="search"/>
+        <b-row class="mt-3">
+            <b-col xl="5" lg="12" md="12" sm="12" class="topology">
+                <b-card no-body>
+                    <div class="topology-title"><h4>Topology View</h4></div>
+                    <topology :mainSearch="search"/>
+                </b-card>
             </b-col>
             <b-col class="searchDetail">
-                <search-detail ref="searchDetail"/>
+                <b-card title="SerarchDetail View">
+                    <search-detail ref="searchDetail"/>
+                </b-card>
             </b-col>
         </b-row>
     </b-container>
@@ -30,10 +35,23 @@ export default {
 
 <style lang="scss">
 .flens-container {
-    min-height: 60rem;
+    min-height: 59rem;
     .topology {
         min-height: 800px;
-        min-width: 600px;
+        min-width: 700px;
+        .card {
+            width: 100%;
+            height: 100%;
+            .topology-title {
+                position: absolute;
+                margin: 1.25rem;
+                left: 0; 
+                top: 0;
+            }
+        }
+    }
+    .searchDetail {
+        min-width: 700px;
     }
 }
 
