@@ -38,7 +38,12 @@
                         selectable
                         sticky-header
                         style="max-height: 50rem"
-                    >
+                    >   
+                       <template #cell(protocol)="row">
+                            <b-button size="sm" @click="openELKWindow()" variant="light">
+                                {{row.item.protocol}} 
+                            </b-button>
+                        </template>
                        <template #cell(detail)="row">
                             <b-button size="sm" @click="row.toggleDetails">
                                 {{ row.detailsShowing ? 'Hide' : 'Show' }} Details
@@ -266,7 +271,7 @@ export default {
             model = model[0];
             let from = model.attributes.metrics.from;
             let to = model.attributes.metrics.to;
-            axios.get("api/dashboard/url?device_id='" + device_id + "'&from=" +from + "&to="+to)
+            axios.get("api/dashboard/url?device_id=" + device_id + "&from=" +from + "&to="+to)
                 .then(function(response) {
                     window.open(response.data, "_blank");
                 })

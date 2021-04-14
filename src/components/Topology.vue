@@ -434,8 +434,9 @@ export default {
             let from = model.attributes.metrics.from;
             let to = model.attributes.metrics.to;
             let device_id = model.device_id;
+            console.log(portId);
             let port = portId;
-            axios.get("api/dashboard/url?device_id='" + device_id + "'&from=" +from + "&to="+to + "&port_id='" + port + "'")
+            axios.get("api/dashboard/url?device_id=" + device_id + "&from=" +from + "&to="+to + "&port_id=" + port + "")
                 .then(function(response) {
                     window.open(response.data, "_blank");
                 })
